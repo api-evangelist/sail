@@ -1,0 +1,592 @@
+openapi: 3.1.0
+info:
+  title: Sail Batches API Messages API API
+  version: '2026-02-18'
+  description: Sail provides OpenAI-compatible Responses and Chat Completions endpoints, plus an Anthropic-compatible Messages endpoint. This reference documents the currently supported subset of fields.
+servers:
+- url: https://api.sailresearch.com/v1
+security:
+- BearerAuth: []
+tags:
+- name: Messages API
+  description: Anthropic-compatible Messages API endpoints.
+paths:
+  /messages:
+    post:
+      operationId: createMessage
+      tags:
+      - Messages API
+      summary: Create an Anthropic message
+      description: Anthropic-compatible Messages endpoint supporting system prompts, tool calling, and streaming (SSE).
+      parameters:
+      - $ref: '#/components/parameters/AnthropicIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+            example:
+              model: zai-org/GLM-5.2-FP8
+              max_tokens: 300
+              messages:
+              - role: user
+                content: Give me a short launch checklist for an API integration.
+      responses:
+        '200':
+          description: 'Anthropic-compatible message response. Returns a single JSON object by default, or an Anthropic Server-Sent Events stream when stream: true.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnthropicMessageResponse'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/AnthropicStreamEvent'
+        '400':
+          description: Invalid request or unsupported feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '408':
+          description: Timed out waiting for completion.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /messages/count_tokens:
+    post:
+      operationId: countMessageTokens
+      tags:
+      - Messages API
+      summary: Count tokens for an Anthropic message
+      description: Counts the input tokens a create-message request would consume, without running the model.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountMessageTokensRequest'
+      responses:
+        '200':
+          description: Input token count.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageTokenCountResponse'
+        '400':
+          description: Invalid request or unsupported feature.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Tokenizer at capacity; retry with backoff (Retry-After header set).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    RequestMetadata:
+      type: object
+      description: Optional string metadata. completion_window controls scheduling; completion_webhook/webhook_token configure completion webhooks.
+      properties:
+        completion_window:
+          type: string
+          description: '[Completion window](/completion-windows) (i.e. latency tier) for the request. Support matrix is available on the [Pricing](/pricing) page. When omitted, defaults to `standard` if that window is supported for the model; otherwise `flex` for async requests when the model supports it, and `asap` in all other cases. See [default behavior](/completion-windows#default-behavior).'
+          enum:
+          - asap
+          - priority
+          - standard
+          - flex
+        completion_webhook:
+          type: string
+          format: uri
+        webhook_token:
+          type: string
+      additionalProperties:
+        type: string
+    AnthropicToolResultBlock:
+      type: object
+      description: Result of a tool call, sent back in a user message.
+      required:
+      - type
+      - tool_use_id
+      - content
+      properties:
+        type:
+          type: string
+          enum:
+          - tool_result
+        tool_use_id:
+          type: string
+        content:
+          oneOf:
+          - type: string
+          - type: array
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/AnthropicTextBlock'
+              - $ref: '#/components/schemas/AnthropicImageBlock'
+        is_error:
+          type: boolean
+        cache_control:
+          $ref: '#/components/schemas/AnthropicCacheControl'
+      additionalProperties: false
+    AnthropicToolUseBlock:
+      type: object
+      description: Tool call emitted by the model. Return its outcome as a tool_result block in a follow-up user message.
+      required:
+      - type
+      - id
+      - name
+      - input
+      properties:
+        type:
+          type: string
+          enum:
+          - tool_use
+        id:
+          type: string
+        name:
+          type: string
+        input:
+          type: object
+          additionalProperties: true
+        cache_control:
+          $ref: '#/components/schemas/AnthropicCacheControl'
+      additionalProperties: false
+    CountMessageTokensRequest:
+      type: object
+      required:
+      - model
+      - messages
+      description: Same shape as a create-message request; max_tokens is optional and ignored for counting.
+      properties:
+        model:
+          type: string
+        max_tokens:
+          type: integer
+          minimum: 1
+          description: Optional here; validated if present, not used for counting.
+        messages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AnthropicMessageParam'
+        system:
+          description: 'System prompt: a string, or an array of text blocks.'
+          oneOf:
+          - type: string
+          - type: array
+            items:
+              $ref: '#/components/schemas/AnthropicTextBlock'
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 1
+        top_p:
+          type: number
+          minimum: 0
+          maximum: 1
+        output_config:
+          $ref: '#/components/schemas/AnthropicOutputConfig'
+        tools:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: Tool definitions the model may call. Responses include `tool_use` blocks; return outcomes as `tool_result` content blocks in a follow-up message.
+        tool_choice:
+          type: object
+          additionalProperties: true
+          description: 'Controls tool use: `auto`, `any`, `tool`, or `none`.'
+        thinking:
+          type: object
+          additionalProperties: true
+          description: Extended thinking configuration; translated to the model's reasoning.
+        metadata:
+          $ref: '#/components/schemas/RequestMetadata'
+        context_management:
+          type: object
+          additionalProperties: true
+          description: Anthropic server-side context-editing config (Claude Code sends it automatically). Accepted for compatibility but ignored — Sail forwards the full context each turn.
+      additionalProperties: false
+    AnthropicRedactedThinkingBlock:
+      type: object
+      description: Redacted extended-thinking block. Accepted when replayed; the opaque encrypted reasoning is not used.
+      required:
+      - type
+      - data
+      properties:
+        type:
+          type: string
+          enum:
+          - redacted_thinking
+        data:
+          type: string
+          description: Opaque, encrypted reasoning payload.
+        cache_control:
+          $ref: '#/components/schemas/AnthropicCacheControl'
+      additionalProperties: false
+    CreateMessageRequest:
+      type: object
+      required:
+      - model
+      - max_tokens
+      - messages
+      properties:
+        model:
+          type: string
+        max_tokens:
+          type: integer
+          minimum: 1
+        messages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AnthropicMessageParam'
+        system:
+          description: 'System prompt: a string, or an array of text blocks.'
+          oneOf:
+          - type: string
+          - type: array
+            items:
+              $ref: '#/components/schemas/AnthropicTextBlock'
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 1
+        top_p:
+          type: number
+          minimum: 0
+          maximum: 1
+        output_config:
+          $ref: '#/components/schemas/AnthropicOutputConfig'
+        tools:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: Tool definitions the model may call. Responses include `tool_use` blocks; return outcomes as `tool_result` content blocks in a follow-up message.
+        tool_choice:
+          type: object
+          additionalProperties: true
+          description: 'Controls tool use: `auto`, `any`, `tool`, or `none`.'
+        thinking:
+          type: object
+          additionalProperties: true
+          description: Extended thinking configuration; translated to the model's reasoning.
+        stream:
+          type: boolean
+          description: When `true`, the response streams as Anthropic Server-Sent Events (`message_start`, `content_block_delta`, `message_stop`, …).
+        metadata:
+          $ref: '#/components/schemas/RequestMetadata'
+        context_management:
+          type: object
+          additionalProperties: true
+          description: Anthropic server-side context-editing config (Claude Code sends it automatically). Accepted for compatibility but ignored — Sail forwards the full context each turn.
+      additionalProperties: false
+    AnthropicImageBlock:
+      type: object
+      description: Image content block. Image input is supported only on multimodal models; see the Models page.
+      required:
+      - type
+      - source
+      properties:
+        type:
+          type: string
+          enum:
+          - image
+        source:
+          oneOf:
+          - type: object
+            required:
+            - type
+            - media_type
+            - data
+            properties:
+              type:
+                type: string
+                enum:
+                - base64
+              media_type:
+                type: string
+                description: Image MIME type, e.g. image/jpeg, image/png, image/webp, image/gif.
+              data:
+                type: string
+                description: 'Base64-encoded image bytes (no data: prefix).'
+            additionalProperties: false
+          - type: object
+            required:
+            - type
+            - url
+            properties:
+              type:
+                type: string
+                enum:
+                - url
+              url:
+                type: string
+                description: Public http(s) URL of the image.
+            additionalProperties: false
+        cache_control:
+          $ref: '#/components/schemas/AnthropicCacheControl'
+      additionalProperties: false
+    AnthropicUsage:
+      type: object
+      required:
+      - input_tokens
+      - output_tokens
+      properties:
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+      additionalProperties: false
+    ErrorObject:
+      type: object
+      required:
+      - message
+      - type
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+        param:
+          oneOf:
+          - type: string
+          - type: 'null'
+        code:
+          oneOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+      additionalProperties: true
+    AnthropicTextBlock:
+      type: object
+      required:
+      - type
+      - text
+      properties:
+        type:
+          type: string
+          enum:
+          - text
+        text:
+          type: string
+        cache_control:
+          $ref: '#/components/schemas/AnthropicCacheControl'
+      additionalProperties: false
+    MessageTokenCountResponse:
+      type: object
+      required:
+      - input_tokens
+      properties:
+        input_tokens:
+          type: integer
+      additionalProperties: false
+    AnthropicMessageResponse:
+      type: object
+      required:
+      - id
+      - type
+      - role
+      - content
+      - model
+      - stop_reason
+      - stop_sequence
+      - usage
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+          - message
+        role:
+          type: string
+          enum:
+          - assistant
+        content:
+          type: array
+          minItems: 1
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/AnthropicTextBlock'
+            - $ref: '#/components/schemas/AnthropicToolUseBlock'
+            - $ref: '#/components/schemas/AnthropicThinkingBlock'
+        model:
+          type: string
+        stop_reason:
+          type: string
+          enum:
+          - end_turn
+          - max_tokens
+          - tool_use
+          - stop_sequence
+          - refusal
+        stop_sequence:
+          oneOf:
+          - type: string
+          - type: 'null'
+        usage:
+          $ref: '#/components/schemas/AnthropicUsage'
+      additionalProperties: false
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorObject'
+      additionalProperties: false
+    AnthropicStreamEvent:
+      type: object
+      description: 'One Server-Sent Event emitted when stream: true — the event''s JSON data payload; the SSE `event:` line carries the same `type`.'
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - message_start
+          - content_block_start
+          - content_block_delta
+          - content_block_stop
+          - message_delta
+          - message_stop
+          - ping
+          - error
+      additionalProperties: true
+    AnthropicThinkingBlock:
+      type: object
+      description: Extended-thinking reasoning block. When continuing a thinking conversation, replay it unchanged (including its signature).
+      required:
+      - type
+      - thinking
+      properties:
+        type:
+          type: string
+          enum:
+          - thinking
+        thinking:
+          type: string
+        signature:
+          type: string
+          description: Opaque signature returned with the block; replay unchanged.
+        cache_control:
+          $ref: '#/components/schemas/AnthropicCacheControl'
+      additionalProperties: false
+    AnthropicOutputConfigFormat:
+      type: object
+      required:
+      - type
+      - schema
+      properties:
+        type:
+          type: string
+          enum:
+          - json_schema
+        schema:
+          type: object
+          additionalProperties: true
+        name:
+          type: string
+        strict:
+          type: boolean
+      additionalProperties: false
+    AnthropicMessageParam:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          - system
+          - developer
+          description: user/assistant per Anthropic; system and developer are also accepted (Claude Code injects mid-conversation system/developer messages).
+        content:
+          oneOf:
+          - type: string
+          - type: array
+            minItems: 1
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/AnthropicTextBlock'
+              - $ref: '#/components/schemas/AnthropicImageBlock'
+              - $ref: '#/components/schemas/AnthropicToolUseBlock'
+              - $ref: '#/components/schemas/AnthropicToolResultBlock'
+              - $ref: '#/components/schemas/AnthropicThinkingBlock'
+              - $ref: '#/components/schemas/AnthropicRedactedThinkingBlock'
+      additionalProperties: false
+    AnthropicOutputConfig:
+      type: object
+      properties:
+        format:
+          $ref: '#/components/schemas/AnthropicOutputConfigFormat'
+        effort:
+          type: string
+          enum:
+          - none
+          - minimal
+          - low
+          - medium
+          - high
+          - xhigh
+          - max
+          description: Reasoning effort for the model (`max` is treated as `xhigh`). Overrides any effort derived from `thinking`.
+      additionalProperties: false
+    AnthropicCacheControl:
+      type: object
+      description: 'Prompt-cache hint (e.g. { "type": "ephemeral" }). Accepted on content blocks for Anthropic SDK compatibility but ignored — no cache read/write; see the Prompt caching note.'
+      properties:
+        type:
+          type: string
+          enum:
+          - ephemeral
+      additionalProperties: true
+  parameters:
+    AnthropicIdempotencyKey:
+      name: anthropic-idempotency-key
+      in: header
+      required: false
+      schema:
+        type: string
+        maxLength: 255
+      description: Anthropic-compatible idempotency header. Same semantics as Idempotency-Key; used on the /messages endpoint to match Anthropic's conventions.
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key

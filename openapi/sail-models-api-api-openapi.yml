@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: Sail Batches API Models API API
+  version: '2026-02-18'
+  description: Sail provides OpenAI-compatible Responses and Chat Completions endpoints, plus an Anthropic-compatible Messages endpoint. This reference documents the currently supported subset of fields.
+servers:
+- url: https://api.sailresearch.com/v1
+security:
+- BearerAuth: []
+tags:
+- name: Models API
+  description: Model discovery endpoints.
+paths:
+  /models:
+    get:
+      operationId: listModels
+      tags:
+      - Models API
+      summary: List supported models
+      responses:
+        '200':
+          description: List of supported models.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelListResponse'
+        '401':
+          description: Authentication error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorObject:
+      type: object
+      required:
+      - message
+      - type
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+        param:
+          oneOf:
+          - type: string
+          - type: 'null'
+        code:
+          oneOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+      additionalProperties: true
+    ModelListResponse:
+      type: object
+      required:
+      - object
+      - data
+      properties:
+        object:
+          type: string
+          enum:
+          - list
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelObject'
+      additionalProperties: false
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorObject'
+      additionalProperties: false
+    ModelObject:
+      type: object
+      required:
+      - id
+      - object
+      - created
+      - owned_by
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+          enum:
+          - model
+        created:
+          type: integer
+        owned_by:
+          type: string
+      additionalProperties: false
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key
