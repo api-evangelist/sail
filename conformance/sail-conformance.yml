@@ -1,0 +1,38 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/sail-openapi-original.json
+standards:
+  - id: openai-responses-compatible
+    conforms: true
+    evidence: POST /responses implements the OpenAI Responses API surface (createResponse/getResponse).
+  - id: openai-chat-completions-compatible
+    conforms: true
+    evidence: POST /chat/completions is an OpenAI-compatible Chat Completions endpoint.
+  - id: anthropic-messages-compatible
+    conforms: true
+    evidence: POST /messages implements the Anthropic-compatible Messages API (+ count_tokens).
+  - id: oauth2
+    conforms: false
+    evidence: Only http bearer (API key) auth is declared; no oauth2 securityScheme.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: Errors use an OpenAI-style application/json envelope, not application/problem+json.
+  - id: sse-streaming
+    conforms: true
+    evidence: Streaming responses returned as Server-Sent Events (chat.completion.chunk / Responses SSE).
+  - id: cursor-pagination
+    conforms: true
+    evidence: GET /batches paginates with after_id/before_id/limit cursor params.
+  - id: idempotency
+    conforms: true
+    evidence: Idempotency-Key header with reservation semantics keyed by org+API key.
+  - id: rfc8594-sunset
+    conforms: false
+    evidence: No Sunset/Deprecation header policy published.
+compliance_program:
+  published: false
+  note: >-
+    A Trust Center (https://trust.sailresearch.com) and a Data Processing
+    Agreement (https://docs.sailresearch.com/dpa) exist, but no specific named
+    certifications (SOC 2 / ISO 27001 / etc.) were machine-verifiable at this
+    pass. No Compliance pointer emitted to avoid asserting unverified certs.

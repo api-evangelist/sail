@@ -1,0 +1,27 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Sail API
+  version: 1.0.0
+extends: openapi/sail-openapi-original.json
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provider: sail
+      x-apievangelist-rating-notes: >-
+        OpenAI/Anthropic-compatible inference API with idempotency, cursor
+        pagination, SSE streaming, completion webhooks, and a date-based version.
+      x-apievangelist-idempotency: Idempotency-Key header (255 chars, reservation-keyed)
+      x-apievangelist-error-envelope: openai
+      x-apievangelist-status-page: https://status.sailresearch.com
+  - target: $.info
+    update:
+      x-artifacts:
+        authentication: authentication/sail-authentication.yml
+        conventions: conventions/sail-conventions.yml
+        errors: errors/sail-problem-types.yml
+        lifecycle: lifecycle/sail-lifecycle.yml
+        webhooks: asyncapi/sail-webhooks.yml
+        data_model: data-model/sail-data-model.yml
+        packages: packages/sail-packages.yml
+        cli: cli/sail-cli.yml
+        mcp: mcp/sail-mcp.yml

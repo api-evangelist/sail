@@ -1,0 +1,55 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.sailresearch.com/idempotency
+spec: openapi/sail-openapi-original.json
+summary: >-
+  Cross-cutting request/response semantics for the Sail inference API. Sail is
+  OpenAI-compatible (Responses, Chat Completions) and Anthropic-compatible
+  (Messages), so most conventions mirror those providers, with Sail-specific
+  additions for idempotency, completion windows, and completion webhooks.
+authentication:
+  style: bearer
+  header: "Authorization: Bearer $SAIL_API_KEY"
+  scheme: BearerAuth (http bearer, bearerFormat "API Key")
+  see: authentication/sail-authentication.yml
+idempotency:
+  supported: true
+  header: Idempotency-Key
+  anthropic_header: Idempotency-Key (on /messages, AnthropicIdempotencyKey parameter)
+  max_length: 255
+  semantics: >-
+    Sail stores a reservation keyed by (organization, API key, Idempotency-Key);
+    retrying with the same value returns the previously computed result rather
+    than re-running inference.
+  docs: https://docs.sailresearch.com/idempotency
+pagination:
+  style: cursor
+  params: [after_id, before_id, limit]
+  applies_to: [GET /batches]
+  response_fields: [data]
+error_envelope:
+  style: openai
+  media_type: application/json
+  shape: "{ error: { message, type, param, code } }"
+  see: errors/sail-problem-types.yml
+rate_limiting:
+  signal: HTTP 429 with Retry-After header
+  guidance: Retry with backoff; the 429 "Tokenizer at capacity" response sets Retry-After.
+  docs: https://docs.sailresearch.com/requests_at_scale
+completion_windows:
+  field: metadata.completion_window
+  values: [asap, priority, standard, flex]
+  purpose: Trade latency for cost; not all models support every window.
+  docs: https://docs.sailresearch.com/completion-windows
+async_and_background:
+  responses_background: "background=true on POST /responses returns 202 + poll via GET /responses/{id}"
+  batches: "POST /batches submits up to 100,000 async requests; poll GET /batches/{id}"
+  webhooks: "metadata.completion_webhook + webhook_token deliver a POST on completion (see asyncapi/sail-webhooks.yml)"
+streaming:
+  transport: Server-Sent Events (SSE)
+  trigger: "stream=true (Chat Completions / Messages) or on foreground Responses"
+versioning:
+  scheme: date-based
+  current: '2026-02-18'
+  location: OpenAPI info.version
+  see: lifecycle/sail-lifecycle.yml

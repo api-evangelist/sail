@@ -1,0 +1,37 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/sail-openapi-original.json
+format: openai-error-envelope
+envelope:
+  media_type: application/json
+  shape: "{ error: { message: string, type: string, param: string|null, code: string|integer|null } }"
+  note: >-
+    Not RFC 9457 problem+json. Sail returns an OpenAI-compatible error object on
+    the `error` key. `type` classifies the error; `code` and `param` are
+    optional machine hints.
+problems:
+  - status: 400
+    title: Invalid request or unsupported feature
+    remediation: Fix the request body or drop the unsupported field (see the API support matrix).
+  - status: 401
+    title: Authentication error
+    remediation: "Provide a valid Authorization: Bearer $SAIL_API_KEY header."
+  - status: 404
+    title: Response not found
+    remediation: Verify the response_id / batch_id; background results expire per retention policy.
+  - status: 408
+    title: Timed out waiting for completion
+    remediation: Use background mode or a longer completion window; retry.
+  - status: 429
+    title: Tokenizer at capacity
+    remediation: Retry with backoff; honor the Retry-After header.
+  - status: 500
+    title: Server error
+    remediation: Retry with backoff; contact support if persistent.
+  - status: 502
+    title: Upstream proxy error
+    remediation: Retry with backoff.
+  - status: 504
+    title: Timed out waiting for completion
+    remediation: Use background mode; retry with a longer completion window.
+docs: https://docs.sailresearch.com/sailbox-sdk-errors

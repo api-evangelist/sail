@@ -1,0 +1,16 @@
+generated: '2026-07-21'
+method: generated
+source: openapi/sail-openapi-original.json
+skills:
+  - file: sail-run-chat-completion.md
+    name: Run a chat completion on Sail
+    api: openapi/sail-openapi-original.json
+    operations: [listModels, createChatCompletion]
+  - file: sail-background-response-with-webhook.md
+    name: Run a background Response and receive a completion webhook
+    api: openapi/sail-openapi-original.json
+    operations: [createResponse, getResponse]
+  - file: sail-submit-batch.md
+    name: Submit and poll a batch of requests
+    api: openapi/sail-openapi-original.json
+    operations: [createBatch, getBatch, getBatchRequestResult, listBatches]

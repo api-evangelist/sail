@@ -1,0 +1,61 @@
+# Sail Research
+
+## Docs
+
+- [Building a tool-calling agent](https://docs.sailresearch.com/agents.md): Multi-turn tool-use conversations with the Sail API
+- [AI Quickstart](https://docs.sailresearch.com/ai-quickstart.md): Set up your coding agent with Sail's docs MCP and workflow skills for migration and agent building.
+- [Create a batch](https://docs.sailresearch.com/api-reference/batches-api/create-a-batch.md): Submit a batch of requests for asynchronous processing.
+- [Get batch request result](https://docs.sailresearch.com/api-reference/batches-api/get-batch-request-result.md): Retrieve the result of a specific request within a batch by its custom_id.
+- [Get batch status](https://docs.sailresearch.com/api-reference/batches-api/get-batch-status.md): Retrieve the current status of a batch.
+- [List batches](https://docs.sailresearch.com/api-reference/batches-api/list-batches.md): List batches with optional pagination.
+- [Create a chat completion](https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion.md): OpenAI-compatible Chat Completions endpoint. Supports streaming via stream: true, which returns a Server-Sent Events stream of chat.completion.chunk objects.
+- [Count tokens for an Anthropic message](https://docs.sailresearch.com/api-reference/messages-api/count-tokens-for-an-anthropic-message.md): Counts the input tokens a create-message request would consume, without running the model.
+- [Create an Anthropic message](https://docs.sailresearch.com/api-reference/messages-api/create-an-anthropic-message.md): Anthropic-compatible Messages endpoint supporting system prompts, tool calling, and streaming (SSE).
+- [List supported models](https://docs.sailresearch.com/api-reference/models-api/list-supported-models.md)
+- [Create a response](https://docs.sailresearch.com/api-reference/responses-api/create-a-response.md): Creates an OpenAI Responses API task. Returns 202 when background=true, otherwise returns 200 after completion. Foreground stream=true requests return OpenAI Responses Server-Sent Events.
+- [Retrieve a response](https://docs.sailresearch.com/api-reference/responses-api/retrieve-a-response.md)
+- [Completion windows](https://docs.sailresearch.com/completion-windows.md): Understanding completion windows and average agent trajectory time
+- [Data processing agreement](https://docs.sailresearch.com/dpa.md): How Sail securely handles customer data
+- [Images](https://docs.sailresearch.com/images.md): Send images to multimodal models
+- [Overview](https://docs.sailresearch.com/index.md): Run long-horizon agents on Sail.
+- [LoRAs](https://docs.sailresearch.com/loras.md): Bring your own PEFT-trained LoRA adapters and run them on supported models
+- [Connect the Docs MCP server](https://docs.sailresearch.com/mcp-server.md): Connect your agents to Sail's documentation over MCP.
+- [Migrate to Sail](https://docs.sailresearch.com/migrate.md): Drop-in migration from OpenAI-compatible providers to Sail.
+- [Models](https://docs.sailresearch.com/models.md): All models currently served by Sail
+- [Using OpenCode with Sail](https://docs.sailresearch.com/opencode.md): Use OpenCode with Sail as your LLM provider.
+- [Pricing](https://docs.sailresearch.com/pricing.md): Per-token pricing for Sail inference
+- [Quickstart](https://docs.sailresearch.com/quickstart.md): Start using Sail with OpenAI clients
+- [CLI](https://docs.sailresearch.com/reference/cli.md): Install the sail command-line tool, plus every command grouped by area
+- [Python SDK](https://docs.sailresearch.com/reference/python-sdk.md): Python SDK installation and full reference
+- [Rust SDK](https://docs.sailresearch.com/reference/rust-sdk.md): Rust SDK installation and API reference on docs.rs
+- [Configuration](https://docs.sailresearch.com/reference/sdk-configuration.md): How the SDK resolves endpoints and retries: sail.Config and sail.RetryPolicy
+- [TypeScript SDK](https://docs.sailresearch.com/reference/typescript-sdk.md): TypeScript SDK installation and full reference
+- [Sending requests at scale](https://docs.sailresearch.com/requests_at_scale.md): Best practices for submitting thousands of concurrent requests to the Sail API
+- [Sailbox](https://docs.sailresearch.com/sailbox-sdk.md): The Sailbox class: create, operate, and tear down Sailboxes
+- [Apps](https://docs.sailresearch.com/sailbox-sdk-apps.md): The org-owned application a Sailbox belongs to
+- [Errors](https://docs.sailresearch.com/sailbox-sdk-errors.md): Sailbox and image error taxonomy
+- [Images & Functions](https://docs.sailresearch.com/sailbox-sdk-images.md): Base images, the custom-image builder, and running Python functions in a Sailbox
+- [Sailboxes](https://docs.sailresearch.com/sailboxes.md): Efficient cloud environments for long-horizon agents
+- [Filesystem](https://docs.sailresearch.com/sailboxes-filesystem.md): Read, write, and stream files in a running Sailbox
+- [Images](https://docs.sailresearch.com/sailboxes-images.md): Build Sailbox images with packages, local files, commands, and environment variables
+- [Lifecycle](https://docs.sailresearch.com/sailboxes-lifecycle.md): Checkpoint, start from checkpoint, pause, sleep, resume, schedule wakes, upgrade, and terminate Sailboxes
+- [Networking](https://docs.sailresearch.com/sailboxes-networking.md): Expose HTTP services, raw TCP ports, and SSH from a Sailbox
+- [Sailbox Pricing](https://docs.sailresearch.com/sailboxes-pricing.md): Observed usage billing dimensions and rates for Sailboxes
+- [Quickstart](https://docs.sailresearch.com/sailboxes-quickstart.md): Start your first Sailbox and run code inside it
+- [Tinker](https://docs.sailresearch.com/sdk-tinker.md): Use Sail inference inside Tinker RL/training loops: sail.SailTokenCompleter and Tinker checkpoint signed URL helpers
+- [API support matrix](https://docs.sailresearch.com/support.md): What each Sail inference API supports today, and what's coming soon
+- [Tinker](https://docs.sailresearch.com/tinker.md): Sample from Tinker-trained LoRA checkpoints on Sail with SailTokenCompleter
+- [RL fine-tuning with Tinker](https://docs.sailresearch.com/tinker-rl.md): Train a LoRA with Tinker while running every rollout on Sail
+- [Overview](https://docs.sailresearch.com/usage.md): Programmatic access to spend, usage, tokens, and latency
+- [Usage API endpoints](https://docs.sailresearch.com/usage-endpoints.md): Reference for every usage route, including spend, tokens, activity, and latency
+- [Introduction](https://docs.sailresearch.com/voyages.md): Observability and timeline for long-running background agents on Sail
+- [Patterns & Best Practices](https://docs.sailresearch.com/voyages-patterns.md): Production patterns for multi-agent Sailbox work and subprocess attach
+- [Quickstart](https://docs.sailresearch.com/voyages-quickstart.md): Ship a Voyage-instrumented agent in 60 seconds
+- [Voyages](https://docs.sailresearch.com/voyages-sdk.md): The sail.voyage API: record agent and task trajectories
+- [Errors](https://docs.sailresearch.com/voyages-sdk-errors.md): Voyage and inference exception taxonomy
+- [Inference](https://docs.sailresearch.com/voyages-sdk-inference.md): Voyage-correlated wrappers over Sail's inference endpoints
+- [Webhooks](https://docs.sailresearch.com/webhooks.md): Receive completion notifications via completion_webhook and webhook_token
+
+## OpenAPI Specs
+
+- [openapi](https://docs.sailresearch.com/openapi.json)

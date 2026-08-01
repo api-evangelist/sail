@@ -1,0 +1,66 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/sail-openapi-original.json
+summary: >-
+  Entity-relationship view derived from the Sail OpenAPI component schemas. Sail
+  is a stateless-inference API: the core resources are Response, ChatCompletion,
+  Message, Batch, and Model. Requests carry shared metadata and produce usage.
+entities:
+  - name: Model
+    schema: ModelObject
+    id_field: id
+    endpoint: GET /v1/models
+    description: A servable open-source model (or LoRA-backed variant).
+  - name: Response
+    schema: ResponseObject
+    id_field: id
+    endpoints: ["POST /v1/responses", "GET /v1/responses/{response_id}"]
+    description: An OpenAI Responses-API task; may run background with polling.
+    fields: [id, object, created_at, status, model, input, output, error, usage]
+  - name: ChatCompletion
+    schema: ChatCompletionResponse
+    id_field: id
+    endpoint: POST /v1/chat/completions
+    description: An OpenAI-compatible chat completion result.
+    fields: [id, object, created, model, choices, usage]
+  - name: Message
+    schema: AnthropicMessageResponse
+    endpoint: POST /v1/messages
+    description: An Anthropic-compatible message result.
+  - name: Batch
+    schema: BatchRequestItem/CreateBatchRequest
+    id_field: batch_id
+    endpoints: ["POST /v1/batches", "GET /v1/batches", "GET /v1/batches/{batch_id}", "GET /v1/batches/{batch_id}/{custom_id}"]
+    description: An asynchronous collection of up to 100k Responses-API requests.
+  - name: Usage
+    schema: ResponseUsage / ChatCompletionUsage / AnthropicUsage
+    description: Token accounting attached to every inference result.
+relationships:
+  - from: Response
+    to: Model
+    type: belongs_to
+    via: model
+  - from: ChatCompletion
+    to: Model
+    type: belongs_to
+    via: model
+  - from: Message
+    to: Model
+    type: belongs_to
+    via: model
+  - from: Batch
+    to: Response
+    type: has_many
+    via: requests (BatchRequestItem, custom_id)
+  - from: Response
+    to: Usage
+    type: has_one
+    via: usage
+  - from: ChatCompletion
+    to: Usage
+    type: has_one
+    via: usage
+notes: >-
+  Object id-prefixes are OpenAI/Anthropic-style discriminators on the `object`
+  field rather than typed string prefixes; batch items are correlated by
+  caller-supplied custom_id.

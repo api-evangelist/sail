@@ -1,0 +1,31 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.sailresearch.com/support
+versioning:
+  scheme: date-based
+  current: '2026-02-18'
+  location: OpenAPI info.version
+  docs: https://docs.sailresearch.com/support
+maturity:
+  - api: Responses
+    endpoint: POST /v1/responses
+    status: stable
+  - api: Chat Completions
+    endpoint: POST /v1/chat/completions
+    status: stable
+  - api: Messages
+    endpoint: POST /v1/messages
+    status: beta
+  - api: Batches
+    endpoint: POST /v1/batches
+    status: stable
+deprecation:
+  policy_url: null
+  sunset_header: false
+  note: No formal deprecation/sunset policy is published in the docs as of this pass.
+sla:
+  url: null
+  uptime_target: null
+status_page: https://status.sailresearch.com
+data_processing_agreement: https://docs.sailresearch.com/dpa
+deprecated_operations: []

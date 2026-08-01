@@ -1,0 +1,2922 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Sail API",
+    "version": "2026-02-18",
+    "description": "Sail provides OpenAI-compatible Responses and Chat Completions endpoints, plus an Anthropic-compatible Messages endpoint. This reference documents the currently supported subset of fields."
+  },
+  "servers": [
+    {
+      "url": "https://api.sailresearch.com/v1"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Models API",
+      "description": "Model discovery endpoints."
+    },
+    {
+      "name": "Responses API",
+      "description": "OpenAI-compatible Responses API endpoints."
+    },
+    {
+      "name": "Chat Completions API",
+      "description": "OpenAI-compatible Chat Completions API endpoints."
+    },
+    {
+      "name": "Messages API",
+      "description": "Anthropic-compatible Messages API endpoints."
+    },
+    {
+      "name": "Batches API",
+      "description": "Submit and manage batches of requests."
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Key"
+      }
+    },
+    "schemas": {
+      "ErrorObject": {
+        "type": "object",
+        "required": [
+          "message",
+          "type"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "param": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "code": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorObject"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RequestMetadata": {
+        "type": "object",
+        "description": "Optional string metadata. completion_window controls scheduling; completion_webhook/webhook_token configure completion webhooks.",
+        "properties": {
+          "completion_window": {
+            "type": "string",
+            "description": "[Completion window](/completion-windows) (i.e. latency tier) for the request. Support matrix is available on the [Pricing](/pricing) page. When omitted, defaults to `standard` if that window is supported for the model; otherwise `flex` for async requests when the model supports it, and `asap` in all other cases. See [default behavior](/completion-windows#default-behavior).",
+            "enum": [
+              "asap",
+              "priority",
+              "standard",
+              "flex"
+            ]
+          },
+          "completion_webhook": {
+            "type": "string",
+            "format": "uri"
+          },
+          "webhook_token": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "ModelObject": {
+        "type": "object",
+        "required": [
+          "id",
+          "object",
+          "created",
+          "owned_by"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string",
+            "enum": [
+              "model"
+            ]
+          },
+          "created": {
+            "type": "integer"
+          },
+          "owned_by": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ModelListResponse": {
+        "type": "object",
+        "required": [
+          "object",
+          "data"
+        ],
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": [
+              "list"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelObject"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseInputTextPart": {
+        "type": "object",
+        "required": [
+          "type",
+          "text"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "input_text"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseInputImagePart": {
+        "type": "object",
+        "description": "Image content part. Image input is supported only on multimodal models; see the Models page.",
+        "required": [
+          "type",
+          "image_url"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "input_image"
+            ]
+          },
+          "image_url": {
+            "type": "string",
+            "description": "Public http(s) URL or a base64 data URI (data:<media-type>;base64,<data>)."
+          },
+          "detail": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "low",
+              "high"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseInputMessage": {
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "system",
+              "user",
+              "assistant",
+              "tool",
+              "function"
+            ]
+          },
+          "content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseInputTextPart"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ResponseInputImagePart"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "tool_call_id": {
+            "type": "string"
+          },
+          "function_call": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseInputObject": {
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ResponseInputMessage"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseInput": {
+        "description": "Text input, plus image input (input_image) on multimodal models. Audio, files, and item references are not currently supported.",
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ResponseInputMessage"
+            }
+          },
+          {
+            "$ref": "#/components/schemas/ResponseInputObject"
+          }
+        ]
+      },
+      "ResponseTextFormat": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "text"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseJsonSchemaFormat": {
+        "type": "object",
+        "required": [
+          "type",
+          "name"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "json_schema"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "strict": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseTextConfiguration": {
+        "type": "object",
+        "required": [
+          "format"
+        ],
+        "properties": {
+          "format": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ResponseTextFormat"
+              },
+              {
+                "$ref": "#/components/schemas/ResponseJsonSchemaFormat"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseReasoningConfiguration": {
+        "type": "object",
+        "properties": {
+          "effort": {
+            "type": "string",
+            "enum": [
+              "none",
+              "minimal",
+              "low",
+              "medium",
+              "high",
+              "xhigh"
+            ]
+          },
+          "generate_summary": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "concise",
+              "detailed"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "CreateResponseRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "input"
+        ],
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ResponseInput"
+          },
+          "raw_prompt_tokens": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            },
+            "minItems": 1,
+            "maxItems": 2000000,
+            "description": "Sail extension: pre-tokenized prompt as an array of token ids, forwarded to the model verbatim (no chat templating or tokenization). When set, `input` is still required but ignored — pass a placeholder string."
+          },
+          "max_output_tokens": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "temperature": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 2
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "top_p": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "$ref": "#/components/schemas/ResponseTextConfiguration"
+          },
+          "reasoning": {
+            "$ref": "#/components/schemas/ResponseReasoningConfiguration"
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Prepended to the input as a system message."
+          },
+          "parallel_tool_calls": {
+            "type": "boolean",
+            "description": "Accepted for OpenAI compatibility. Models decide their own tool-call cadence, so this field has no effect."
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Additional data to include. reasoning.encrypted_content is accepted for OpenAI-client compatibility, but reasoning items are returned without encrypted content."
+          },
+          "background": {
+            "type": "boolean"
+          },
+          "prompt_cache_key": {
+            "type": "string",
+            "description": "Optional routing hint for prompt-prefix cache locality. Requests with the same key are preferentially routed to maximize cache hit rates."
+          },
+          "store": {
+            "type": "boolean",
+            "description": "Accepted for OpenAI compatibility. false does not change Sail's normal temporary request/response storage for processing, retries, polling, and idempotency; Customer Data remains governed by Sail's DPA retention and deletion terms."
+          },
+          "truncation": {
+            "type": "string",
+            "enum": [
+              "disabled"
+            ]
+          },
+          "stream": {
+            "type": "boolean",
+            "description": "When true on a foreground request, returns OpenAI Responses Server-Sent Events. background=true requests cannot be streamed."
+          },
+          "user": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/RequestMetadata"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ResponseUsageDetails": {
+        "type": "object",
+        "required": [
+          "cached_tokens",
+          "reasoning_tokens"
+        ],
+        "properties": {
+          "cached_tokens": {
+            "type": "integer"
+          },
+          "reasoning_tokens": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseUsage": {
+        "type": "object",
+        "required": [
+          "input_tokens",
+          "input_tokens_details",
+          "output_tokens",
+          "output_tokens_details",
+          "total_tokens"
+        ],
+        "properties": {
+          "input_tokens": {
+            "type": "integer"
+          },
+          "input_tokens_details": {
+            "$ref": "#/components/schemas/ResponseUsageDetails"
+          },
+          "output_tokens": {
+            "type": "integer"
+          },
+          "output_tokens_details": {
+            "$ref": "#/components/schemas/ResponseUsageDetails"
+          },
+          "total_tokens": {
+            "type": "integer"
+          },
+          "prompt_tokens": {
+            "type": "integer"
+          },
+          "completion_tokens": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseObject": {
+        "type": "object",
+        "required": [
+          "id",
+          "object",
+          "created_at",
+          "status",
+          "model",
+          "metadata",
+          "usage"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string",
+            "enum": [
+              "response"
+            ]
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "failed",
+              "completed",
+              "cancelled"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ResponseInput"
+          },
+          "output": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "incomplete_details": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_output_tokens": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasoning": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "text": {
+            "$ref": "#/components/schemas/ResponseTextConfiguration"
+          },
+          "store": {
+            "type": "boolean"
+          },
+          "temperature": {
+            "type": "number"
+          },
+          "top_p": {
+            "type": "number"
+          },
+          "parallel_tool_calls": {
+            "type": "boolean"
+          },
+          "tool_choice": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              }
+            ]
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "truncation": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              }
+            ]
+          },
+          "usage": {
+            "$ref": "#/components/schemas/ResponseUsage"
+          },
+          "user": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "ChatTextContentPart": {
+        "type": "object",
+        "required": [
+          "type",
+          "text"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "text"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatImageContentPart": {
+        "type": "object",
+        "description": "Image content part. Image input is supported only on multimodal models; see the Models page.",
+        "required": [
+          "type",
+          "image_url"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "image_url"
+            ]
+          },
+          "image_url": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Public http(s) URL or a base64 data URI."
+              },
+              "detail": {
+                "type": "string",
+                "enum": [
+                  "auto",
+                  "low",
+                  "high"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionMessage": {
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "system",
+              "user",
+              "assistant",
+              "tool",
+              "function",
+              "developer"
+            ]
+          },
+          "content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ChatTextContentPart"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ChatImageContentPart"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "tool_call_id": {
+            "type": "string"
+          },
+          "function_call": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatResponseFormatText": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "text"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatResponseFormatJsonSchema": {
+        "type": "object",
+        "required": [
+          "type",
+          "json_schema"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "json_schema"
+            ]
+          },
+          "json_schema": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "strict": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateChatCompletionRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "messages"
+        ],
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ChatCompletionMessage"
+            }
+          },
+          "temperature": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 2
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "top_p": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_completion_tokens": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "response_format": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ChatResponseFormatText"
+              },
+              {
+                "$ref": "#/components/schemas/ChatResponseFormatJsonSchema"
+              }
+            ]
+          },
+          "reasoning_effort": {
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "minimal",
+                  "low",
+                  "medium",
+                  "high",
+                  "xhigh"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "n": {
+            "type": "integer",
+            "enum": [
+              1
+            ],
+            "description": "Only n=1 is currently supported."
+          },
+          "modalities": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "text"
+              ]
+            }
+          },
+          "stream": {
+            "type": "boolean",
+            "description": "When true, the response is returned as a Server-Sent Events stream of chat.completion.chunk objects instead of a single JSON response."
+          },
+          "stream_options": {
+            "type": "object",
+            "description": "Options that apply when stream is true.",
+            "properties": {
+              "include_usage": {
+                "type": "boolean",
+                "description": "When true, emit a final chunk with token usage for the full request before the [DONE] terminator."
+              }
+            },
+            "additionalProperties": false
+          },
+          "store": {
+            "type": "boolean",
+            "enum": [
+              true
+            ],
+            "description": "Only true is supported."
+          },
+          "user": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/RequestMetadata"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ChatCompletionResponseMessage": {
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "assistant"
+            ]
+          },
+          "content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasoning_content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "refusal": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "ChatCompletionChoice": {
+        "type": "object",
+        "required": [
+          "index",
+          "message",
+          "logprobs",
+          "finish_reason"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "message": {
+            "$ref": "#/components/schemas/ChatCompletionResponseMessage"
+          },
+          "logprobs": {
+            "type": "null"
+          },
+          "finish_reason": {
+            "type": "string",
+            "enum": [
+              "stop",
+              "length",
+              "tool_calls",
+              "content_filter",
+              "function_call"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionUsage": {
+        "type": "object",
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens"
+        ],
+        "properties": {
+          "prompt_tokens": {
+            "type": "integer"
+          },
+          "completion_tokens": {
+            "type": "integer"
+          },
+          "total_tokens": {
+            "type": "integer"
+          },
+          "prompt_tokens_details": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "completion_tokens_details": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "object",
+          "created",
+          "model",
+          "choices"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string",
+            "enum": [
+              "chat.completion"
+            ]
+          },
+          "created": {
+            "type": "integer"
+          },
+          "model": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ChatCompletionChoice"
+            }
+          },
+          "usage": {
+            "$ref": "#/components/schemas/ChatCompletionUsage"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ChatCompletionChunkToolCallFunction": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionChunkToolCall": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "function": {
+            "$ref": "#/components/schemas/ChatCompletionChunkToolCallFunction"
+          },
+          "custom": {
+            "$ref": "#/components/schemas/ChatCompletionChunkToolCallFunction"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionChunkDelta": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "reasoning_content": {
+            "type": "string"
+          },
+          "refusal": {
+            "type": "string"
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatCompletionChunkToolCall"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionChunkChoice": {
+        "type": "object",
+        "required": [
+          "index",
+          "delta"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer"
+          },
+          "delta": {
+            "$ref": "#/components/schemas/ChatCompletionChunkDelta"
+          },
+          "logprobs": {
+            "type": "null"
+          },
+          "finish_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "stop",
+              "tool_calls",
+              null
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionChunk": {
+        "type": "object",
+        "description": "One Server-Sent Events chunk emitted when stream: true. The streamed response is a sequence of these chat.completion.chunk objects, each sent as an SSE data: line and terminated by a final data: [DONE] line.",
+        "required": [
+          "id",
+          "object",
+          "created",
+          "model",
+          "choices"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string",
+            "enum": [
+              "chat.completion.chunk"
+            ]
+          },
+          "created": {
+            "type": "integer"
+          },
+          "model": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatCompletionChunkChoice"
+            }
+          },
+          "usage": {
+            "$ref": "#/components/schemas/ChatCompletionUsage"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicCacheControl": {
+        "type": "object",
+        "description": "Prompt-cache hint (e.g. { \"type\": \"ephemeral\" }). Accepted on content blocks for Anthropic SDK compatibility but ignored — no cache read/write; see the Prompt caching note.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "ephemeral"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "AnthropicTextBlock": {
+        "type": "object",
+        "required": [
+          "type",
+          "text"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "text"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "cache_control": {
+            "$ref": "#/components/schemas/AnthropicCacheControl"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicImageBlock": {
+        "type": "object",
+        "description": "Image content block. Image input is supported only on multimodal models; see the Models page.",
+        "required": [
+          "type",
+          "source"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "image"
+            ]
+          },
+          "source": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "media_type",
+                  "data"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "base64"
+                    ]
+                  },
+                  "media_type": {
+                    "type": "string",
+                    "description": "Image MIME type, e.g. image/jpeg, image/png, image/webp, image/gif."
+                  },
+                  "data": {
+                    "type": "string",
+                    "description": "Base64-encoded image bytes (no data: prefix)."
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "url"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "url"
+                    ]
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "Public http(s) URL of the image."
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          },
+          "cache_control": {
+            "$ref": "#/components/schemas/AnthropicCacheControl"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicToolUseBlock": {
+        "type": "object",
+        "description": "Tool call emitted by the model. Return its outcome as a tool_result block in a follow-up user message.",
+        "required": [
+          "type",
+          "id",
+          "name",
+          "input"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "tool_use"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "input": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "cache_control": {
+            "$ref": "#/components/schemas/AnthropicCacheControl"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicToolResultBlock": {
+        "type": "object",
+        "description": "Result of a tool call, sent back in a user message.",
+        "required": [
+          "type",
+          "tool_use_id",
+          "content"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "tool_result"
+            ]
+          },
+          "tool_use_id": {
+            "type": "string"
+          },
+          "content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AnthropicTextBlock"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AnthropicImageBlock"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "is_error": {
+            "type": "boolean"
+          },
+          "cache_control": {
+            "$ref": "#/components/schemas/AnthropicCacheControl"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicThinkingBlock": {
+        "type": "object",
+        "description": "Extended-thinking reasoning block. When continuing a thinking conversation, replay it unchanged (including its signature).",
+        "required": [
+          "type",
+          "thinking"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "thinking"
+            ]
+          },
+          "thinking": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Opaque signature returned with the block; replay unchanged."
+          },
+          "cache_control": {
+            "$ref": "#/components/schemas/AnthropicCacheControl"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicRedactedThinkingBlock": {
+        "type": "object",
+        "description": "Redacted extended-thinking block. Accepted when replayed; the opaque encrypted reasoning is not used.",
+        "required": [
+          "type",
+          "data"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "redacted_thinking"
+            ]
+          },
+          "data": {
+            "type": "string",
+            "description": "Opaque, encrypted reasoning payload."
+          },
+          "cache_control": {
+            "$ref": "#/components/schemas/AnthropicCacheControl"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicStreamEvent": {
+        "type": "object",
+        "description": "One Server-Sent Event emitted when stream: true — the event's JSON data payload; the SSE `event:` line carries the same `type`.",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "message_start",
+              "content_block_start",
+              "content_block_delta",
+              "content_block_stop",
+              "message_delta",
+              "message_stop",
+              "ping",
+              "error"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "AnthropicMessageParam": {
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant",
+              "system",
+              "developer"
+            ],
+            "description": "user/assistant per Anthropic; system and developer are also accepted (Claude Code injects mid-conversation system/developer messages)."
+          },
+          "content": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AnthropicTextBlock"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AnthropicImageBlock"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AnthropicToolUseBlock"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AnthropicToolResultBlock"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AnthropicThinkingBlock"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AnthropicRedactedThinkingBlock"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicOutputConfigFormat": {
+        "type": "object",
+        "required": [
+          "type",
+          "schema"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "json_schema"
+            ]
+          },
+          "schema": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "strict": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicOutputConfig": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "$ref": "#/components/schemas/AnthropicOutputConfigFormat"
+          },
+          "effort": {
+            "type": "string",
+            "enum": [
+              "none",
+              "minimal",
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ],
+            "description": "Reasoning effort for the model (`max` is treated as `xhigh`). Overrides any effort derived from `thinking`."
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateMessageRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "max_tokens",
+          "messages"
+        ],
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/AnthropicMessageParam"
+            }
+          },
+          "system": {
+            "description": "System prompt: a string, or an array of text blocks.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AnthropicTextBlock"
+                }
+              }
+            ]
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "output_config": {
+            "$ref": "#/components/schemas/AnthropicOutputConfig"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "Tool definitions the model may call. Responses include `tool_use` blocks; return outcomes as `tool_result` content blocks in a follow-up message."
+          },
+          "tool_choice": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Controls tool use: `auto`, `any`, `tool`, or `none`."
+          },
+          "thinking": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Extended thinking configuration; translated to the model's reasoning."
+          },
+          "stream": {
+            "type": "boolean",
+            "description": "When `true`, the response streams as Anthropic Server-Sent Events (`message_start`, `content_block_delta`, `message_stop`, …)."
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/RequestMetadata"
+          },
+          "context_management": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Anthropic server-side context-editing config (Claude Code sends it automatically). Accepted for compatibility but ignored — Sail forwards the full context each turn."
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicUsage": {
+        "type": "object",
+        "required": [
+          "input_tokens",
+          "output_tokens"
+        ],
+        "properties": {
+          "input_tokens": {
+            "type": "integer"
+          },
+          "output_tokens": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AnthropicMessageResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "role",
+          "content",
+          "model",
+          "stop_reason",
+          "stop_sequence",
+          "usage"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "message"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "assistant"
+            ]
+          },
+          "content": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AnthropicTextBlock"
+                },
+                {
+                  "$ref": "#/components/schemas/AnthropicToolUseBlock"
+                },
+                {
+                  "$ref": "#/components/schemas/AnthropicThinkingBlock"
+                }
+              ]
+            }
+          },
+          "model": {
+            "type": "string"
+          },
+          "stop_reason": {
+            "type": "string",
+            "enum": [
+              "end_turn",
+              "max_tokens",
+              "tool_use",
+              "stop_sequence",
+              "refusal"
+            ]
+          },
+          "stop_sequence": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "usage": {
+            "$ref": "#/components/schemas/AnthropicUsage"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchRequestItem": {
+        "type": "object",
+        "required": [
+          "custom_id",
+          "params"
+        ],
+        "properties": {
+          "custom_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9_-]*$",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "A unique identifier for this request within the batch. Must be lowercase alphanumeric and can include hyphens and underscores. Min 1 character, max 64 characters."
+          },
+          "params": {
+            "type": "object",
+            "description": "The request parameters (same fields as a Responses API request body).",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBatchRequest": {
+        "type": "object",
+        "required": [
+          "endpoint",
+          "requests"
+        ],
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "enum": [
+              "/v1/responses"
+            ],
+            "description": "The API endpoint to use for all requests in the batch. Currently only /v1/responses is supported."
+          },
+          "requests": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100000,
+            "description": "The list of requests in the batch. Min 1, max 100,000 requests. Total request body must not exceed 256 MB.",
+            "items": {
+              "$ref": "#/components/schemas/BatchRequestItem"
+            }
+          },
+          "label": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "maxLength": 128,
+            "description": "An optional label for the batch. Must be alphanumeric (hyphens and underscores allowed), max 128 characters."
+          }
+        },
+        "additionalProperties": false
+      },
+      "CountMessageTokensRequest": {
+        "type": "object",
+        "required": [
+          "model",
+          "messages"
+        ],
+        "description": "Same shape as a create-message request; max_tokens is optional and ignored for counting.",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Optional here; validated if present, not used for counting."
+          },
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/AnthropicMessageParam"
+            }
+          },
+          "system": {
+            "description": "System prompt: a string, or an array of text blocks.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AnthropicTextBlock"
+                }
+              }
+            ]
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "output_config": {
+            "$ref": "#/components/schemas/AnthropicOutputConfig"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "Tool definitions the model may call. Responses include `tool_use` blocks; return outcomes as `tool_result` content blocks in a follow-up message."
+          },
+          "tool_choice": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Controls tool use: `auto`, `any`, `tool`, or `none`."
+          },
+          "thinking": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Extended thinking configuration; translated to the model's reasoning."
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/RequestMetadata"
+          },
+          "context_management": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Anthropic server-side context-editing config (Claude Code sends it automatically). Accepted for compatibility but ignored — Sail forwards the full context each turn."
+          }
+        },
+        "additionalProperties": false
+      },
+      "MessageTokenCountResponse": {
+        "type": "object",
+        "required": [
+          "input_tokens"
+        ],
+        "properties": {
+          "input_tokens": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics."
+      },
+      "AnthropicIdempotencyKey": {
+        "name": "anthropic-idempotency-key",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": "Anthropic-compatible idempotency header. Same semantics as Idempotency-Key; used on the /messages endpoint to match Anthropic's conventions."
+      }
+    }
+  },
+  "paths": {
+    "/models": {
+      "get": {
+        "operationId": "listModels",
+        "tags": [
+          "Models API"
+        ],
+        "summary": "List supported models",
+        "responses": {
+          "200": {
+            "description": "List of supported models.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/responses": {
+      "post": {
+        "operationId": "createResponse",
+        "tags": [
+          "Responses API"
+        ],
+        "summary": "Create a response",
+        "description": "Creates an OpenAI Responses API task. Returns 202 when background=true, otherwise returns 200 after completion. Foreground stream=true requests return OpenAI Responses Server-Sent Events.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateResponseRequest"
+              },
+              "examples": {
+                "basic": {
+                  "value": {
+                    "model": "zai-org/GLM-5.2-FP8",
+                    "input": "Explain the key ideas behind transformer architectures."
+                  }
+                },
+                "background": {
+                  "value": {
+                    "model": "zai-org/GLM-5.2-FP8",
+                    "input": "Summarize this document.",
+                    "background": true,
+                    "metadata": {
+                      "completion_window": "standard"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response completed and returned synchronously. When stream=true, returns Server-Sent Events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseObject"
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Response accepted for asynchronous processing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unsupported feature.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream proxy error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Timed out waiting for completion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/responses/{response_id}": {
+      "get": {
+        "operationId": "getResponse",
+        "tags": [
+          "Responses API"
+        ],
+        "summary": "Retrieve a response",
+        "parameters": [
+          {
+            "name": "response_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The response object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseObject"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/completions": {
+      "post": {
+        "operationId": "createChatCompletion",
+        "tags": [
+          "Chat Completions API"
+        ],
+        "summary": "Create a chat completion",
+        "description": "OpenAI-compatible Chat Completions endpoint. Supports streaming via stream: true, which returns a Server-Sent Events stream of chat.completion.chunk objects.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatCompletionRequest"
+              },
+              "example": {
+                "model": "zai-org/GLM-5.2-FP8",
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You are a concise assistant."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Summarize retrieval-augmented generation in 3 bullets."
+                  }
+                ],
+                "max_completion_tokens": 300
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chat completion. Returns a single JSON object by default, or a Server-Sent Events stream of chat.completion.chunk objects when stream: true (terminated by a final data: [DONE] line).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionChunk"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unsupported feature.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Timed out waiting for completion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages": {
+      "post": {
+        "operationId": "createMessage",
+        "tags": [
+          "Messages API"
+        ],
+        "summary": "Create an Anthropic message",
+        "description": "Anthropic-compatible Messages endpoint supporting system prompts, tool calling, and streaming (SSE).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AnthropicIdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMessageRequest"
+              },
+              "example": {
+                "model": "zai-org/GLM-5.2-FP8",
+                "max_tokens": 300,
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Give me a short launch checklist for an API integration."
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Anthropic-compatible message response. Returns a single JSON object by default, or an Anthropic Server-Sent Events stream when stream: true.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnthropicMessageResponse"
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnthropicStreamEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unsupported feature.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Timed out waiting for completion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/batches": {
+      "post": {
+        "operationId": "createBatch",
+        "tags": [
+          "Batches API"
+        ],
+        "summary": "Create a batch",
+        "description": "Submit a batch of requests for asynchronous processing.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBatchRequest"
+              },
+              "example": {
+                "endpoint": "/v1/responses",
+                "label": "my-batch-job",
+                "requests": [
+                  {
+                    "custom_id": "my-first-request",
+                    "params": {
+                      "model": "zai-org/GLM-5.2-FP8",
+                      "max_output_tokens": 1024,
+                      "input": [
+                        {
+                          "role": "user",
+                          "content": "Hello, world!"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "custom_id": "my-second-request",
+                    "params": {
+                      "model": "zai-org/GLM-5.2-FP8",
+                      "max_output_tokens": 1024,
+                      "input": [
+                        {
+                          "role": "user",
+                          "content": "Hello again!"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "request_counts",
+                    "created_at"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the batch."
+                    },
+                    "request_counts": {
+                      "type": "integer",
+                      "description": "Total number of requests in the batch."
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "description": "Unix timestamp of when the batch was created."
+                    },
+                    "label": {
+                      "type": "string",
+                      "description": "The label for the batch, if provided."
+                    }
+                  }
+                },
+                "example": {
+                  "id": "batch_abc123",
+                  "request_counts": 2,
+                  "created_at": 1741564800,
+                  "label": "my-batch-job"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listBatches",
+        "tags": [
+          "Batches API"
+        ],
+        "summary": "List batches",
+        "description": "List batches with optional pagination.",
+        "parameters": [
+          {
+            "name": "after_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Return batches created after this batch ID."
+          },
+          {
+            "name": "before_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Return batches created before this batch ID."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "minimum": 1,
+              "maximum": 200
+            },
+            "description": "Maximum number of batches to return. Min 1, defaults to 25, max 200."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of batches.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "request_counts",
+                      "created_at"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the batch."
+                      },
+                      "request_counts": {
+                        "type": "integer",
+                        "description": "Total number of requests in the batch."
+                      },
+                      "created_at": {
+                        "type": "integer",
+                        "description": "Unix timestamp of when the batch was created."
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "The label for the batch, if provided."
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "id": "batch_abc123",
+                    "request_counts": 2,
+                    "created_at": 1741564800,
+                    "label": "my-batch-job"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/batches/{batch_id}": {
+      "get": {
+        "operationId": "getBatch",
+        "tags": [
+          "Batches API"
+        ],
+        "summary": "Get batch status",
+        "description": "Retrieve the current status of a batch.",
+        "parameters": [
+          {
+            "name": "batch_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the current status of a batch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "request_counts",
+                    "created_at",
+                    "request_status"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the batch."
+                    },
+                    "request_counts": {
+                      "type": "integer",
+                      "description": "Total number of requests in the batch."
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "description": "Unix timestamp of when the batch was created."
+                    },
+                    "label": {
+                      "type": "string",
+                      "description": "The label for the batch, if provided."
+                    },
+                    "request_status": {
+                      "type": "object",
+                      "description": "A map of custom_id to its current status.",
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "id": "batch_abc123",
+                  "request_counts": 2,
+                  "created_at": 1741564800,
+                  "label": "my-batch-job",
+                  "request_status": {
+                    "my-first-request": {
+                      "status": "COMPLETED"
+                    },
+                    "my-second-request": {
+                      "status": "RUNNING"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Batch not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/batches/{batch_id}/{custom_id}": {
+      "get": {
+        "operationId": "getBatchRequestResult",
+        "tags": [
+          "Batches API"
+        ],
+        "summary": "Get batch request result",
+        "description": "Retrieve the result of a specific request within a batch by its custom_id.",
+        "parameters": [
+          {
+            "name": "batch_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the batch."
+          },
+          {
+            "name": "custom_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The custom_id of the request within the batch."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The response object for the given request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Batch or request not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/count_tokens": {
+      "post": {
+        "operationId": "countMessageTokens",
+        "tags": [
+          "Messages API"
+        ],
+        "summary": "Count tokens for an Anthropic message",
+        "description": "Counts the input tokens a create-message request would consume, without running the model.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountMessageTokensRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Input token count.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageTokenCountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unsupported feature.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Tokenizer at capacity; retry with backoff (Retry-After header set).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

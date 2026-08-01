@@ -1,0 +1,32 @@
+generated: '2026-07-21'
+method: searched
+type: Webhooks
+source: https://docs.sailresearch.com/webhooks
+spec_type: none
+summary: >-
+  Sail delivers per-request completion notifications via webhooks. There is no
+  published AsyncAPI document; this captures the documented webhook surface.
+configuration:
+  fields:
+    - name: completion_webhook
+      location: request metadata
+      description: Your HTTPS endpoint URL to receive the completion callback (optional).
+    - name: webhook_token
+      location: request metadata
+      description: Secret sent back as an Authorization Bearer token for verification (optional).
+  applies_to:
+    - POST /v1/responses
+    - POST /v1/chat/completions
+    - POST /v1/messages
+events:
+  - name: completion
+    trigger: The inference request finishes.
+    delivery: "POST to completion_webhook, Content-Type application/json."
+    payload: "Identical JSON object returned by GET /v1/responses/{response_id}."
+    verification: "webhook_token sent as Authorization: Bearer <token>."
+delivery:
+  retries: Up to 3 attempts on non-2xx or network failure.
+  timeout_seconds: 30
+  duplicates: Possible — log response IDs to dedupe.
+  guarantee: Best-effort; failures do not affect direct API result retrieval.
+  expected_response: Return 2xx promptly to stop retries.

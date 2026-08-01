@@ -1,0 +1,34 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.sailresearch.com/reference/python-sdk
+packages:
+  - language: python
+    registry: pypi
+    name: sail
+    version: 0.4.4
+    url: https://pypi.org/project/sail/
+    install: pip install sail
+    repository: https://github.com/sailresearchco/sail
+    official: true
+    notes: Python SDK for the Sail platform (inference + Sailboxes). Python 3.9+. Also installable via `uv add sail`.
+  - language: typescript
+    registry: npm
+    name: "@sailresearch/sdk"
+    version: 0.4.4
+    url: https://www.npmjs.com/package/@sailresearch/sdk
+    install: npm install @sailresearch/sdk
+    repository: https://github.com/sailresearchco/sail
+    official: true
+    notes: TypeScript SDK for Sail sandboxes (Sailboxes) on Node and Bun.
+  - language: cli
+    registry: native
+    name: sail
+    url: https://cli.sailresearch.com/install.sh
+    install: "curl -fsSL https://cli.sailresearch.com/install.sh | sh"
+    repository: https://github.com/sailresearchco/sail
+    official: true
+    notes: Single native binary, no runtime dependencies. Also `pip install sail`. See cli/sail-cli.yml for the command surface.
+rust_sdk_note: >-
+  Docs reference an official Rust SDK on crates.io/docs.rs, but the exact crate
+  name could not be verified (the `sail` crate on crates.io is an unrelated
+  sequence-analysis library). Not listed to avoid a wrong pointer.

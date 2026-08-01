@@ -1,0 +1,34 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.sailresearch.com/reference/cli
+name: sail
+description: >-
+  Single native binary (no runtime dependencies) for managing Sail apps and
+  Sailboxes — authenticate, create/operate/tear-down long-horizon compute
+  environments, and manage config. One shared install per user.
+install:
+  macos_linux: "curl -fsSL https://cli.sailresearch.com/install.sh | sh"
+  windows: "irm https://cli.sailresearch.com/install.ps1 | iex"
+  python: pip install sail
+binary_catalogued_in: packages/sail-packages.yml
+commands:
+  - group: auth
+    subcommands: [login, whoami, logout]
+  - group: app
+    subcommands: [find, create, list]
+  - group: box
+    subcommands: [show, top, list, terminate, sleep, pause, resume, checkpoint, from-checkpoint, upgrade, create, exec, run, shell, cp, expose, unexpose, listeners, address, ssh]
+  - group: config
+    subcommands: [get, set, unset, reset]
+  - group: shell
+    subcommands: []
+    note: Interactive REPL for Sailbox management without the `sail` prefix.
+  - group: update
+    subcommands: []
+    note: Upgrade the CLI itself.
+key_flows:
+  - "Authenticate: sail auth login"
+  - "Run ephemeral compute: sail box run / sail box exec"
+  - "Interactive box: sail box shell"
+  - "Monitor: sail box top"
+  - "State preservation: sail box checkpoint / from-checkpoint"

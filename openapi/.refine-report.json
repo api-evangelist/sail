@@ -1,0 +1,22 @@
+{
+  "provider": "sail",
+  "sources": [
+    "sail-batches-api-api-openapi.yml",
+    "sail-chat-completions-api-api-openapi.yml",
+    "sail-messages-api-api-openapi.yml",
+    "sail-models-api-api-openapi.yml",
+    "sail-responses-api-api-openapi.yml"
+  ],
+  "outputs": [
+    "sail-batches-api-api-openapi.yml",
+    "sail-chat-completions-api-api-openapi.yml",
+    "sail-messages-api-api-openapi.yml",
+    "sail-models-api-api-openapi.yml",
+    "sail-responses-api-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
