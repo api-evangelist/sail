@@ -1,0 +1,386 @@
+{
+  "item": [
+    {
+      "id": "f44d8cfa-1848-4487-988a-8dc8b86ca55e",
+      "name": "Chat Completions API",
+      "description": {
+        "content": "OpenAI-compatible Chat Completions API endpoints.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "d2b3a028-522c-4c5e-aacc-a7b8b7296322",
+          "name": "Create a chat completion",
+          "request": {
+            "name": "Create a chat completion",
+            "description": {
+              "content": "OpenAI-compatible Chat Completions endpoint. Supports streaming via stream: true, which returns a Server-Sent Events stream of chat.completion.chunk objects.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "chat",
+                "completions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                "key": "Idempotency-Key",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"<string>\",\n  \"messages\": [\n    {\n      \"role\": \"<string>\",\n      \"content\": \"<string>\",\n      \"name\": \"<string>\",\n      \"tool_calls\": [\n        {\n          \"key_0\": \"string\"\n        },\n        {\n          \"key_0\": \"string\",\n          \"key_1\": 8672,\n          \"key_2\": 1854.6035836308317\n        }\n      ],\n      \"tool_call_id\": \"<string>\",\n      \"function_call\": {\n        \"key_0\": 5425,\n        \"key_1\": 4558.690106645603\n      }\n    }\n  ],\n  \"temperature\": \"<number>\",\n  \"top_p\": \"<number>\",\n  \"max_completion_tokens\": \"<integer>\",\n  \"response_format\": {\n    \"type\": \"<string>\"\n  },\n  \"reasoning_effort\": \"<string>\",\n  \"n\": \"<integer>\",\n  \"modalities\": [\n    \"<string>\"\n  ],\n  \"stream\": \"<boolean>\",\n  \"stream_options\": {\n    \"include_usage\": \"<boolean>\"\n  },\n  \"store\": \"<boolean>\",\n  \"user\": \"<string>\",\n  \"metadata\": {\n    \"completion_window\": \"<string>\",\n    \"completion_webhook\": \"<uri>\",\n    \"webhook_token\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "72fe588e-6e63-40b7-b882-3f9056ee32f6",
+              "name": "Chat completion. Returns a single JSON object by default, or a Server-Sent Events stream of chat.completion.chunk objects when stream: true (terminated by a final data: [DONE] line).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "chat",
+                    "completions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a concise assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Summarize retrieval-augmented generation in 3 bullets.\"\n    }\n  ],\n  \"max_completion_tokens\": 300\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"object\": \"chat.completion\",\n  \"created\": 6459,\n  \"model\": \"string\",\n  \"choices\": [\n    {\n      \"index\": 3021,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"string\",\n        \"reasoning_content\": \"string\",\n        \"refusal\": \"string\"\n      },\n      \"logprobs\": null,\n      \"finish_reason\": \"function_call\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 3292,\n    \"completion_tokens\": 7248,\n    \"total_tokens\": 3199,\n    \"prompt_tokens_details\": {\n      \"key_0\": false\n    },\n    \"completion_tokens_details\": {\n      \"key_0\": \"string\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "be8db1eb-0aac-470d-93e7-b1a1275bddb8",
+              "name": "Invalid request or unsupported feature.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "chat",
+                    "completions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a concise assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Summarize retrieval-augmented generation in 3 bullets.\"\n    }\n  ],\n  \"max_completion_tokens\": 300\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "40814f45-55f5-4be5-b67e-66d41ae2cb0e",
+              "name": "Authentication error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "chat",
+                    "completions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a concise assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Summarize retrieval-augmented generation in 3 bullets.\"\n    }\n  ],\n  \"max_completion_tokens\": 300\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "90c850a8-7b47-4294-aaf0-a5d45a20ec19",
+              "name": "Timed out waiting for completion.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "chat",
+                    "completions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a concise assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Summarize retrieval-augmented generation in 3 bullets.\"\n    }\n  ],\n  \"max_completion_tokens\": 300\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Request Timeout",
+              "code": 408,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "af600ad9-1bbd-494f-8329-eb3a5de71340",
+              "name": "Server error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "chat",
+                    "completions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a concise assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Summarize retrieval-augmented generation in 3 bullets.\"\n    }\n  ],\n  \"max_completion_tokens\": 300\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.sailresearch.com/v1",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "8e522307-725a-418e-90d5-36bb3c3792cb",
+    "name": "Sail Batches API Chat Completions API API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Sail provides OpenAI-compatible Responses and Chat Completions endpoints, plus an Anthropic-compatible Messages endpoint. This reference documents the currently supported subset of fields.",
+      "type": "text/plain"
+    }
+  }
+}

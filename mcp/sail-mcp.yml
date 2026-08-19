@@ -4,20 +4,23 @@ status: published
 source: https://docs.sailresearch.com/mcp-server
 server:
   name: sail-docs
-  description: >-
-    Sail's official hosted documentation MCP server. Connects agents to Sail's
-    docs so they can answer questions about models, pricing, completion windows,
-    and Sailbox setup while building or migrating to Sail.
+  description: Sail's official hosted documentation MCP server. Connects agents to Sail's docs so they
+    can answer questions about models, pricing, completion windows, and Sailbox setup while building or
+    migrating to Sail.
   transport: http
   url: https://docs.sailresearch.com/mcp
   hosted: true
   auth: none
 install:
-  claude_code: "claude mcp add --transport http sail-docs https://docs.sailresearch.com/mcp"
-  note: Any MCP client that supports streamable HTTP works (Codex, Cursor, VS Code, Claude Desktop, ChatGPT connectors).
+  claude_code: claude mcp add --transport http sail-docs https://docs.sailresearch.com/mcp
+  note: Any MCP client that supports streamable HTTP works (Codex, Cursor, VS Code, Claude Desktop, ChatGPT
+    connectors).
 scope: documentation
-notes: >-
-  This is a documentation-answering MCP server, not an API-operation server. It
-  exposes Sail's docs corpus to agents; it does not wrap the inference API
-  operations. The inference API itself is OpenAI/Anthropic-compatible and used
-  via standard SDKs (see packages/sail-packages.yml).
+notes: This is a documentation-answering MCP server, not an API-operation server. It exposes Sail's docs
+  corpus to agents; it does not wrap the inference API operations. The inference API itself is OpenAI/Anthropic-compatible
+  and used via standard SDKs (see packages/sail-packages.yml).
+deployment:
+  mode: remote
+  verified: searched
+  checked: '2026-08-12'
+  source: catalog MCP census

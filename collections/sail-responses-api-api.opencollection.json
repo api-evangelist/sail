@@ -1,0 +1,63 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sail Batches API Responses API API",
+    "version": "2026-02-18"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Responses API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a response",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.sailresearch.com/v1/responses",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates an OpenAI Responses API task. Returns 202 when background=true, otherwise returns 200 after completion. Foreground stream=true requests return OpenAI Responses Server-Sent Events."
+        },
+        {
+          "info": {
+            "name": "Retrieve a response",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.sailresearch.com/v1/responses/:response_id",
+            "params": [
+              {
+                "name": "response_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve a response"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

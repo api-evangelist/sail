@@ -1,0 +1,35 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sail Batches API Models API API",
+    "version": "2026-02-18"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Models API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List supported models",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.sailresearch.com/v1/models"
+          },
+          "docs": "List supported models"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

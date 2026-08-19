@@ -1,0 +1,743 @@
+{
+  "item": [
+    {
+      "id": "76ad6cfb-3c53-4502-9add-ce642e237dd1",
+      "name": "Responses API",
+      "description": {
+        "content": "OpenAI-compatible Responses API endpoints.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6fa4e572-20af-47e3-a45a-c46b75439806",
+          "name": "Create a response",
+          "request": {
+            "name": "Create a response",
+            "description": {
+              "content": "Creates an OpenAI Responses API task. Returns 202 when background=true, otherwise returns 200 after completion. Foreground stream=true requests return OpenAI Responses Server-Sent Events.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "responses"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                "key": "Idempotency-Key",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"<string>\",\n  \"input\": \"<string>\",\n  \"raw_prompt_tokens\": [\n    \"<integer>\"\n  ],\n  \"max_output_tokens\": \"<integer>\",\n  \"temperature\": \"<number>\",\n  \"top_p\": \"<number>\",\n  \"text\": {\n    \"format\": {\n      \"type\": \"<string>\"\n    }\n  },\n  \"reasoning\": {\n    \"effort\": \"<string>\",\n    \"generate_summary\": \"<string>\"\n  },\n  \"instructions\": \"<string>\",\n  \"parallel_tool_calls\": \"<boolean>\",\n  \"include\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"background\": \"<boolean>\",\n  \"prompt_cache_key\": \"<string>\",\n  \"store\": \"<boolean>\",\n  \"truncation\": \"<string>\",\n  \"stream\": \"<boolean>\",\n  \"user\": \"<string>\",\n  \"metadata\": {\n    \"completion_window\": \"<string>\",\n    \"completion_webhook\": \"<uri>\",\n    \"webhook_token\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "8c91fddf-db95-4011-9745-2dfd5009c3c5",
+              "name": "Response completed and returned synchronously. When stream=true, returns Server-Sent Events.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"object\": \"response\",\n  \"created_at\": 7633,\n  \"status\": \"cancelled\",\n  \"model\": \"string\",\n  \"metadata\": {\n    \"key_0\": 8918.926340846876,\n    \"key_1\": 5010.606989262769,\n    \"key_2\": \"string\"\n  },\n  \"usage\": {\n    \"input_tokens\": 3370,\n    \"input_tokens_details\": {\n      \"cached_tokens\": 608,\n      \"reasoning_tokens\": 2647\n    },\n    \"output_tokens\": 7673,\n    \"output_tokens_details\": {\n      \"cached_tokens\": 8462,\n      \"reasoning_tokens\": 7011\n    },\n    \"total_tokens\": 8686,\n    \"prompt_tokens\": 6777,\n    \"completion_tokens\": 2380\n  },\n  \"input\": \"string\",\n  \"output\": \"string\",\n  \"error\": {\n    \"key_0\": 8608,\n    \"key_1\": 3385.2570163692776\n  },\n  \"incomplete_details\": {\n    \"key_0\": 1612\n  },\n  \"max_output_tokens\": 2200,\n  \"reasoning\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\",\n    \"key_2\": 7088.308622495889,\n    \"key_3\": 6974.444271394984\n  },\n  \"text\": {\n    \"format\": {\n      \"type\": \"text\"\n    }\n  },\n  \"store\": false,\n  \"temperature\": 7420.613184686513,\n  \"top_p\": 5174.546439608588,\n  \"parallel_tool_calls\": true,\n  \"tool_choice\": \"string\",\n  \"tools\": [\n    {\n      \"key_0\": false,\n      \"key_1\": 5678.111800502224\n    },\n    {\n      \"key_0\": 3133,\n      \"key_1\": \"string\"\n    }\n  ],\n  \"truncation\": \"string\",\n  \"user\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e61f9860-a2e7-46d8-adb9-b6c7a31cc3a7",
+              "name": "Response accepted for asynchronous processing.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"object\": \"response\",\n  \"created_at\": 7633,\n  \"status\": \"cancelled\",\n  \"model\": \"string\",\n  \"metadata\": {\n    \"key_0\": 8918.926340846876,\n    \"key_1\": 5010.606989262769,\n    \"key_2\": \"string\"\n  },\n  \"usage\": {\n    \"input_tokens\": 3370,\n    \"input_tokens_details\": {\n      \"cached_tokens\": 608,\n      \"reasoning_tokens\": 2647\n    },\n    \"output_tokens\": 7673,\n    \"output_tokens_details\": {\n      \"cached_tokens\": 8462,\n      \"reasoning_tokens\": 7011\n    },\n    \"total_tokens\": 8686,\n    \"prompt_tokens\": 6777,\n    \"completion_tokens\": 2380\n  },\n  \"input\": \"string\",\n  \"output\": \"string\",\n  \"error\": {\n    \"key_0\": 8608,\n    \"key_1\": 3385.2570163692776\n  },\n  \"incomplete_details\": {\n    \"key_0\": 1612\n  },\n  \"max_output_tokens\": 2200,\n  \"reasoning\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\",\n    \"key_2\": 7088.308622495889,\n    \"key_3\": 6974.444271394984\n  },\n  \"text\": {\n    \"format\": {\n      \"type\": \"text\"\n    }\n  },\n  \"store\": false,\n  \"temperature\": 7420.613184686513,\n  \"top_p\": 5174.546439608588,\n  \"parallel_tool_calls\": true,\n  \"tool_choice\": \"string\",\n  \"tools\": [\n    {\n      \"key_0\": false,\n      \"key_1\": 5678.111800502224\n    },\n    {\n      \"key_0\": 3133,\n      \"key_1\": \"string\"\n    }\n  ],\n  \"truncation\": \"string\",\n  \"user\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "da1f9d3b-d4b5-4a83-bcb8-e91bd2747536",
+              "name": "Invalid request or unsupported feature.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "42f4f83a-848b-46d3-adc1-84a30ab14ef3",
+              "name": "Authentication error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "140668f9-fce6-4431-b14f-ef8c1fbb15df",
+              "name": "Server error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "44cf4b23-8c84-4315-b00f-7a1698e46e8c",
+              "name": "Upstream proxy error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Gateway",
+              "code": 502,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "36107b88-7001-4434-9e5c-acd6c747834e",
+              "name": "Timed out waiting for completion.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Makes the request retry-safe. Sail stores a reservation keyed by (organization, API key, Idempotency-Key); retrying with the same value returns the previously stored response instead of re-running inference. Keys are capped at 255 characters. See [Idempotent Requests](/idempotency) for full semantics.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"model\": \"zai-org/GLM-5.2-FP8\",\n  \"input\": \"Explain the key ideas behind transformer architectures.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Gateway Timeout",
+              "code": 504,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "bbbc052d-c6ca-464b-88af-8c26cc356fd6",
+          "name": "Retrieve a response",
+          "request": {
+            "name": "Retrieve a response",
+            "description": {},
+            "url": {
+              "path": [
+                "responses",
+                ":response_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "response_id",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8468534c-adab-4860-8113-0ea2bf869694",
+              "name": "The response object.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses",
+                    ":response_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "response_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"object\": \"response\",\n  \"created_at\": 7633,\n  \"status\": \"cancelled\",\n  \"model\": \"string\",\n  \"metadata\": {\n    \"key_0\": 8918.926340846876,\n    \"key_1\": 5010.606989262769,\n    \"key_2\": \"string\"\n  },\n  \"usage\": {\n    \"input_tokens\": 3370,\n    \"input_tokens_details\": {\n      \"cached_tokens\": 608,\n      \"reasoning_tokens\": 2647\n    },\n    \"output_tokens\": 7673,\n    \"output_tokens_details\": {\n      \"cached_tokens\": 8462,\n      \"reasoning_tokens\": 7011\n    },\n    \"total_tokens\": 8686,\n    \"prompt_tokens\": 6777,\n    \"completion_tokens\": 2380\n  },\n  \"input\": \"string\",\n  \"output\": \"string\",\n  \"error\": {\n    \"key_0\": 8608,\n    \"key_1\": 3385.2570163692776\n  },\n  \"incomplete_details\": {\n    \"key_0\": 1612\n  },\n  \"max_output_tokens\": 2200,\n  \"reasoning\": {\n    \"key_0\": \"string\",\n    \"key_1\": \"string\",\n    \"key_2\": 7088.308622495889,\n    \"key_3\": 6974.444271394984\n  },\n  \"text\": {\n    \"format\": {\n      \"type\": \"text\"\n    }\n  },\n  \"store\": false,\n  \"temperature\": 7420.613184686513,\n  \"top_p\": 5174.546439608588,\n  \"parallel_tool_calls\": true,\n  \"tool_choice\": \"string\",\n  \"tools\": [\n    {\n      \"key_0\": false,\n      \"key_1\": 5678.111800502224\n    },\n    {\n      \"key_0\": 3133,\n      \"key_1\": \"string\"\n    }\n  ],\n  \"truncation\": \"string\",\n  \"user\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1d711a0a-6769-47d5-aecd-a9db469cff83",
+              "name": "Authentication error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses",
+                    ":response_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "response_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "42e82bb2-f689-4a70-b48b-b4507e5ce2da",
+              "name": "Response not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses",
+                    ":response_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "response_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b65d2779-4afe-4749-99d8-42fa387d61d9",
+              "name": "Server error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "responses",
+                    ":response_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "response_id",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"message\": \"string\",\n    \"type\": \"string\",\n    \"param\": \"string\",\n    \"code\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.sailresearch.com/v1",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "258ddca3-c980-4a44-bb94-5f9192312187",
+    "name": "Sail Batches API Responses API API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Sail provides OpenAI-compatible Responses and Chat Completions endpoints, plus an Anthropic-compatible Messages endpoint. This reference documents the currently supported subset of fields.",
+      "type": "text/plain"
+    }
+  }
+}

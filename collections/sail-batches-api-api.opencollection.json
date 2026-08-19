@@ -1,0 +1,119 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sail Batches API API",
+    "version": "2026-02-18"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Batches API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List batches",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.sailresearch.com/v1/batches",
+            "params": [
+              {
+                "name": "after_id",
+                "value": "",
+                "type": "query",
+                "description": "Return batches created after this batch ID."
+              },
+              {
+                "name": "before_id",
+                "value": "",
+                "type": "query",
+                "description": "Return batches created before this batch ID."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of batches to return. Min 1, defaults to 25, max 200."
+              }
+            ]
+          },
+          "docs": "List batches with optional pagination."
+        },
+        {
+          "info": {
+            "name": "Create a batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.sailresearch.com/v1/batches",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Submit a batch of requests for asynchronous processing."
+        },
+        {
+          "info": {
+            "name": "Get batch status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.sailresearch.com/v1/batches/:batch_id",
+            "params": [
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve the current status of a batch."
+        },
+        {
+          "info": {
+            "name": "Get batch request result",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.sailresearch.com/v1/batches/:batch_id/:custom_id",
+            "params": [
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the batch."
+              },
+              {
+                "name": "custom_id",
+                "value": "",
+                "type": "path",
+                "description": "The custom_id of the request within the batch."
+              }
+            ]
+          },
+          "docs": "Retrieve the result of a specific request within a batch by its custom_id."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

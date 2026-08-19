@@ -1,0 +1,60 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sail Batches API Messages API API",
+    "version": "2026-02-18"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Messages API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create an Anthropic message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.sailresearch.com/v1/messages",
+            "headers": [
+              {
+                "name": "anthropic-idempotency-key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Anthropic-compatible Messages endpoint supporting system prompts, tool calling, and streaming (SSE)."
+        },
+        {
+          "info": {
+            "name": "Count tokens for an Anthropic message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.sailresearch.com/v1/messages/count_tokens",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Counts the input tokens a create-message request would consume, without running the model."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
