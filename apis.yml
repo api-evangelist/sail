@@ -1,17 +1,13 @@
 aid: sail
 name: Sail
-description: >-
-  Sail Research provides cloud infrastructure for running long-horizon AI agents
-  efficiently. Its inference platform serves leading open-source models (GLM,
-  Kimi, DeepSeek, gpt-oss, Gemma, and more) through an OpenAI-compatible
-  Responses and Chat Completions API plus an Anthropic-compatible Messages API,
-  so existing SDKs work as drop-in clients. "Completion windows" (asap, priority,
-  standard, flex) trade latency for 30-80% token savings, and a Batch API
-  processes up to 100,000 requests asynchronously. Sailboxes add persistent
-  virtual-machine compute for agents that need to run indefinitely, with
-  checkpoint/resume, networking, and a native CLI. The platform supports LoRA
-  fine-tunes, Tinker RL rollouts, prompt caching, completion webhooks, and
-  usage/observability (Voyages) for background agents.
+description: Sail Research provides cloud infrastructure for running long-horizon AI agents efficiently.
+  Its inference platform serves leading open-source models (GLM, Kimi, DeepSeek, gpt-oss, Gemma, and more)
+  through an OpenAI-compatible Responses and Chat Completions API plus an Anthropic-compatible Messages
+  API, so existing SDKs work as drop-in clients. "Completion windows" (asap, priority, standard, flex)
+  trade latency for 30-80% token savings, and a Batch API processes up to 100,000 requests asynchronously.
+  Sailboxes add persistent virtual-machine compute for agents that need to run indefinitely, with checkpoint/resume,
+  networking, and a native CLI. The platform supports LoRA fine-tunes, Tinker RL rollouts, prompt caching,
+  completion webhooks, and usage/observability (Voyages) for background agents.
 url: https://raw.githubusercontent.com/api-evangelist/sail/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -46,7 +42,7 @@ accessModel:
   method: derived
 specificationVersion: '0.23'
 created: '2026-07-17'
-modified: '2026-07-21'
+modified: '2026-09-16'
 image: https://sailresearch.com/og-image.png
 tags:
 - Company
@@ -70,10 +66,9 @@ tags_raw:
 - Developer Tools
 apis:
 - aid: sail:sail-batches-api-api
-  name: Sail Batches API API
+  name: Sail Batches API
   description: Submit and manage batches of requests.
-  humanURL: >-
-    https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
+  humanURL: https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
   baseURL: https://api.sailresearch.com/v1
   tags:
   - Batches API
@@ -85,10 +80,9 @@ apis:
   - type: DataModel
     url: data-model/sail-data-model.yml
 - aid: sail:sail-chat-completions-api-api
-  name: Sail Chat Completions API API
+  name: Sail Chat Completions API
   description: OpenAI-compatible Chat Completions API endpoints.
-  humanURL: >-
-    https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
+  humanURL: https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
   baseURL: https://api.sailresearch.com/v1
   tags:
   - Chat Completions API
@@ -100,10 +94,9 @@ apis:
   - type: DataModel
     url: data-model/sail-data-model.yml
 - aid: sail:sail-messages-api-api
-  name: Sail Messages API API
+  name: Sail Messages API
   description: Anthropic-compatible Messages API endpoints.
-  humanURL: >-
-    https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
+  humanURL: https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
   baseURL: https://api.sailresearch.com/v1
   tags:
   - Messages API
@@ -115,10 +108,9 @@ apis:
   - type: DataModel
     url: data-model/sail-data-model.yml
 - aid: sail:sail-models-api-api
-  name: Sail Models API API
+  name: Sail Models API
   description: Model discovery endpoints.
-  humanURL: >-
-    https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
+  humanURL: https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
   baseURL: https://api.sailresearch.com/v1
   tags:
   - Models API
@@ -130,10 +122,9 @@ apis:
   - type: DataModel
     url: data-model/sail-data-model.yml
 - aid: sail:sail-responses-api-api
-  name: Sail Responses API API
+  name: Sail Responses API
   description: OpenAI-compatible Responses API endpoints.
-  humanURL: >-
-    https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
+  humanURL: https://docs.sailresearch.com/api-reference/chat-completions-api/create-a-chat-completion
   baseURL: https://api.sailresearch.com/v1
   tags:
   - Responses API
