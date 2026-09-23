@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sail Batches API Responses API API
+  title: Sail Responses API
   version: '2026-02-18'
   description: Sail provides OpenAI-compatible Responses and Chat Completions endpoints, plus an Anthropic-compatible Messages endpoint. This reference documents the currently supported subset of fields.
 servers:
@@ -124,60 +124,24 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    RequestMetadata:
-      type: object
-      description: Optional string metadata. completion_window controls scheduling; completion_webhook/webhook_token configure completion webhooks.
-      properties:
-        completion_window:
-          type: string
-          description: '[Completion window](/completion-windows) (i.e. latency tier) for the request. Support matrix is available on the [Pricing](/pricing) page. When omitted, defaults to `standard` if that window is supported for the model; otherwise `flex` for async requests when the model supports it, and `asap` in all other cases. See [default behavior](/completion-windows#default-behavior).'
-          enum:
-          - asap
-          - priority
-          - standard
-          - flex
-        completion_webhook:
-          type: string
-          format: uri
-        webhook_token:
-          type: string
-      additionalProperties:
-        type: string
-    ResponseInputMessage:
+    ResponseInputObject:
       type: object
       required:
-      - role
-      - content
+      - messages
       properties:
-        role:
-          type: string
-          enum:
-          - system
-          - user
-          - assistant
-          - tool
-          - function
-        content:
-          oneOf:
-          - type: string
-          - type: array
-            minItems: 1
-            items:
-              oneOf:
-              - $ref: '#/components/schemas/ResponseInputTextPart'
-              - $ref: '#/components/schemas/ResponseInputImagePart'
-        name:
-          type: string
-        tool_calls:
+        messages:
           type: array
+          minItems: 1
           items:
-            type: object
-            additionalProperties: true
-        tool_call_id:
-          type: string
-        function_call:
-          type: object
-          additionalProperties: true
+            $ref: '#/components/schemas/ResponseInputMessage'
+      additionalProperties: false
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorObject'
       additionalProperties: false
     ResponseInputImagePart:
       type: object
@@ -200,54 +164,36 @@ components:
           - low
           - high
       additionalProperties: false
-    ResponseTextConfiguration:
+    ErrorObject:
       type: object
       required:
-      - format
+      - message
+      - type
       properties:
-        format:
+        message:
+          type: string
+        type:
+          type: string
+        param:
           oneOf:
-          - $ref: '#/components/schemas/ResponseTextFormat'
-          - $ref: '#/components/schemas/ResponseJsonSchemaFormat'
-      additionalProperties: false
-    ResponseInputObject:
-      type: object
-      required:
-      - messages
-      properties:
-        messages:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/ResponseInputMessage'
-      additionalProperties: false
-    ErrorResponse:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          $ref: '#/components/schemas/ErrorObject'
-      additionalProperties: false
-    ResponseReasoningConfiguration:
-      type: object
-      properties:
-        effort:
-          type: string
-          enum:
-          - none
-          - minimal
-          - low
-          - medium
-          - high
-          - xhigh
-        generate_summary:
-          type: string
-          enum:
-          - auto
-          - concise
-          - detailed
+          - type: string
+          - type: 'null'
+        code:
+          oneOf:
+          - type: string
+          - type: integer
+          - type: 'null'
       additionalProperties: true
+    ResponseTextFormat:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - text
+      additionalProperties: false
     ResponseInputTextPart:
       type: object
       required:
@@ -261,6 +207,35 @@ components:
         text:
           type: string
       additionalProperties: false
+    ResponseInput:
+      description: Text input, plus image input (input_image) on multimodal models. Audio, files, and item references are not currently supported.
+      oneOf:
+      - type: string
+        minLength: 1
+      - type: array
+        minItems: 1
+        items:
+          $ref: '#/components/schemas/ResponseInputMessage'
+      - $ref: '#/components/schemas/ResponseInputObject'
+    RequestMetadata:
+      type: object
+      description: Optional string metadata. completion_window controls scheduling; completion_webhook/webhook_token configure completion webhooks.
+      properties:
+        completion_window:
+          type: string
+          description: '[Completion window](/completion-windows) (i.e. latency tier) for the request. Support matrix is available on the [Pricing](/pricing) page. When omitted, defaults to `standard` if that window is supported for the model; otherwise `flex` for async requests when the model supports it, and `asap` in all other cases. See [default behavior](/completion-windows#default-behavior).'
+          enum:
+          - asap
+          - priority
+          - standard
+          - flex
+        completion_webhook:
+          type: string
+          format: uri
+        webhook_token:
+          type: string
+      additionalProperties:
+        type: string
     CreateResponseRequest:
       type: object
       required:
@@ -333,50 +308,6 @@ components:
         metadata:
           $ref: '#/components/schemas/RequestMetadata'
       additionalProperties: true
-    ResponseUsage:
-      type: object
-      required:
-      - input_tokens
-      - input_tokens_details
-      - output_tokens
-      - output_tokens_details
-      - total_tokens
-      properties:
-        input_tokens:
-          type: integer
-        input_tokens_details:
-          $ref: '#/components/schemas/ResponseUsageDetails'
-        output_tokens:
-          type: integer
-        output_tokens_details:
-          $ref: '#/components/schemas/ResponseUsageDetails'
-        total_tokens:
-          type: integer
-        prompt_tokens:
-          type: integer
-        completion_tokens:
-          type: integer
-      additionalProperties: false
-    ResponseTextFormat:
-      type: object
-      required:
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - text
-      additionalProperties: false
-    ResponseInput:
-      description: Text input, plus image input (input_image) on multimodal models. Audio, files, and item references are not currently supported.
-      oneOf:
-      - type: string
-        minLength: 1
-      - type: array
-        minItems: 1
-        items:
-          $ref: '#/components/schemas/ResponseInputMessage'
-      - $ref: '#/components/schemas/ResponseInputObject'
     ResponseObject:
       type: object
       required:
@@ -470,25 +401,94 @@ components:
           type: object
           additionalProperties: true
       additionalProperties: true
-    ErrorObject:
+    ResponseUsage:
       type: object
       required:
-      - message
-      - type
+      - input_tokens
+      - input_tokens_details
+      - output_tokens
+      - output_tokens_details
+      - total_tokens
       properties:
-        message:
+        input_tokens:
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/ResponseUsageDetails'
+        output_tokens:
+          type: integer
+        output_tokens_details:
+          $ref: '#/components/schemas/ResponseUsageDetails'
+        total_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        completion_tokens:
+          type: integer
+      additionalProperties: false
+    ResponseTextConfiguration:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          oneOf:
+          - $ref: '#/components/schemas/ResponseTextFormat'
+          - $ref: '#/components/schemas/ResponseJsonSchemaFormat'
+      additionalProperties: false
+    ResponseInputMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
           type: string
-        type:
-          type: string
-        param:
+          enum:
+          - system
+          - user
+          - assistant
+          - tool
+          - function
+        content:
           oneOf:
           - type: string
-          - type: 'null'
-        code:
-          oneOf:
-          - type: string
-          - type: integer
-          - type: 'null'
+          - type: array
+            minItems: 1
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/ResponseInputTextPart'
+              - $ref: '#/components/schemas/ResponseInputImagePart'
+        name:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        tool_call_id:
+          type: string
+        function_call:
+          type: object
+          additionalProperties: true
+      additionalProperties: false
+    ResponseReasoningConfiguration:
+      type: object
+      properties:
+        effort:
+          type: string
+          enum:
+          - none
+          - minimal
+          - low
+          - medium
+          - high
+          - xhigh
+        generate_summary:
+          type: string
+          enum:
+          - auto
+          - concise
+          - detailed
       additionalProperties: true
     ResponseUsageDetails:
       type: object

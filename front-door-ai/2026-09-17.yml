@@ -1,0 +1,31 @@
+# Front Door AI Index — sail — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: sail
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: www.sailresearch.com
+  final_host: www.sailresearch.com
+  ownership: shared
+  owner: sail-research
+  shares_host_with:
+  - sail-research
+  inherited_from: null
+  verdict: scored
+  score: null
+  host_score: 21
+  density: null
+  words: 1097
+  tiers:
+    agentic: 10
+    core: 3
+    model: 8
+  ambiguous: 14
+  top_terms:
+    agent: 12
+    inference: 10
+    OpenAI: 5
+    AI: 3
+    Anthropic: 3
+    intelligence: 2

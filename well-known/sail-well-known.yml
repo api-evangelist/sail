@@ -1,12 +1,15 @@
 generated: '2026-07-21'
 method: searched
 source: live probes of /.well-known/* on Sail hosts
-summary: >-
-  No /.well-known/ discovery documents are published on the Sail API, docs, or
-  marketing hosts. All probed paths returned 404. Recorded as valid negative
-  data; no WellKnown/SecurityTxt pointer emitted.
-hosts_probed: [api.sailresearch.com, docs.sailresearch.com, www.sailresearch.com]
-documents:
+summary: No /.well-known/ discovery documents are published on the Sail API, docs, or marketing hosts.
+  All probed paths returned 404. Recorded as valid negative data; no WellKnown/SecurityTxt pointer emitted.
+hosts_probed:
+- api.sailresearch.com
+- docs.sailresearch.com
+- www.sailresearch.com
+hosts:
+- host: ''
+  documents:
   - path: /.well-known/security.txt
     status: 404
   - path: /.well-known/openid-configuration
@@ -17,3 +20,8 @@ documents:
     status: 404
   - path: /.well-known/ai-plugin.json
     status: 404
+x-shape-fix:
+  converted: '2026-08-20'
+  from: documents
+  note: Rewritten into hosts[] -> documents[], the only shape well_known_docs() in score.rb reads. A served
+    .well-known surface recorded in any other shape scores as absent.
