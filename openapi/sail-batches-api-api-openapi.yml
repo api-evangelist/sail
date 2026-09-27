@@ -303,17 +303,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    ResponseInputObject:
-      type: object
-      required:
-      - messages
-      properties:
-        messages:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/ResponseInputMessage'
-      additionalProperties: false
     BatchRequestItem:
       type: object
       required:
@@ -329,6 +318,93 @@ components:
         params:
           type: object
           description: The request parameters (same fields as a Responses API request body).
+          additionalProperties: true
+      additionalProperties: false
+    ResponseInputObject:
+      type: object
+      required:
+      - messages
+      properties:
+        messages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ResponseInputMessage'
+      additionalProperties: false
+    ResponseInput:
+      description: Text input, plus image input (input_image) on multimodal models. Audio, files, and item references are not currently supported.
+      oneOf:
+      - type: string
+        minLength: 1
+      - type: array
+        minItems: 1
+        items:
+          $ref: '#/components/schemas/ResponseInputMessage'
+      - $ref: '#/components/schemas/ResponseInputObject'
+    ResponseJsonSchemaFormat:
+      type: object
+      required:
+      - type
+      - name
+      properties:
+        type:
+          type: string
+          enum:
+          - json_schema
+        name:
+          type: string
+        description:
+          type: string
+        schema:
+          type: object
+          additionalProperties: true
+        strict:
+          type: boolean
+      additionalProperties: false
+    ResponseTextConfiguration:
+      type: object
+      required:
+      - format
+      properties:
+        format:
+          oneOf:
+          - $ref: '#/components/schemas/ResponseTextFormat'
+          - $ref: '#/components/schemas/ResponseJsonSchemaFormat'
+      additionalProperties: false
+    ResponseInputMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - system
+          - user
+          - assistant
+          - tool
+          - function
+        content:
+          oneOf:
+          - type: string
+          - type: array
+            minItems: 1
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/ResponseInputTextPart'
+              - $ref: '#/components/schemas/ResponseInputImagePart'
+        name:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        tool_call_id:
+          type: string
+        function_call:
+          type: object
           additionalProperties: true
       additionalProperties: false
     ResponseInputImagePart:
@@ -352,67 +428,6 @@ components:
           - low
           - high
       additionalProperties: false
-    ErrorResponse:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          $ref: '#/components/schemas/ErrorObject'
-      additionalProperties: false
-    ErrorObject:
-      type: object
-      required:
-      - message
-      - type
-      properties:
-        message:
-          type: string
-        type:
-          type: string
-        param:
-          oneOf:
-          - type: string
-          - type: 'null'
-        code:
-          oneOf:
-          - type: string
-          - type: integer
-          - type: 'null'
-      additionalProperties: true
-    ResponseTextFormat:
-      type: object
-      required:
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - text
-      additionalProperties: false
-    ResponseInputTextPart:
-      type: object
-      required:
-      - type
-      - text
-      properties:
-        type:
-          type: string
-          enum:
-          - input_text
-        text:
-          type: string
-      additionalProperties: false
-    ResponseInput:
-      description: Text input, plus image input (input_image) on multimodal models. Audio, files, and item references are not currently supported.
-      oneOf:
-      - type: string
-        minLength: 1
-      - type: array
-        minItems: 1
-        items:
-          $ref: '#/components/schemas/ResponseInputMessage'
-      - $ref: '#/components/schemas/ResponseInputObject'
     ResponseObject:
       type: object
       required:
@@ -506,29 +521,15 @@ components:
           type: object
           additionalProperties: true
       additionalProperties: true
-    ResponseUsage:
+    ResponseTextFormat:
       type: object
       required:
-      - input_tokens
-      - input_tokens_details
-      - output_tokens
-      - output_tokens_details
-      - total_tokens
+      - type
       properties:
-        input_tokens:
-          type: integer
-        input_tokens_details:
-          $ref: '#/components/schemas/ResponseUsageDetails'
-        output_tokens:
-          type: integer
-        output_tokens_details:
-          $ref: '#/components/schemas/ResponseUsageDetails'
-        total_tokens:
-          type: integer
-        prompt_tokens:
-          type: integer
-        completion_tokens:
-          type: integer
+        type:
+          type: string
+          enum:
+          - text
       additionalProperties: false
     CreateBatchRequest:
       type: object
@@ -554,51 +555,49 @@ components:
           maxLength: 128
           description: An optional label for the batch. Must be alphanumeric (hyphens and underscores allowed), max 128 characters.
       additionalProperties: false
-    ResponseTextConfiguration:
+    ErrorObject:
       type: object
       required:
-      - format
+      - message
+      - type
       properties:
-        format:
-          oneOf:
-          - $ref: '#/components/schemas/ResponseTextFormat'
-          - $ref: '#/components/schemas/ResponseJsonSchemaFormat'
-      additionalProperties: false
-    ResponseInputMessage:
-      type: object
-      required:
-      - role
-      - content
-      properties:
-        role:
+        message:
           type: string
-          enum:
-          - system
-          - user
-          - assistant
-          - tool
-          - function
-        content:
+        type:
+          type: string
+        param:
           oneOf:
           - type: string
-          - type: array
-            minItems: 1
-            items:
-              oneOf:
-              - $ref: '#/components/schemas/ResponseInputTextPart'
-              - $ref: '#/components/schemas/ResponseInputImagePart'
-        name:
-          type: string
-        tool_calls:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-        tool_call_id:
-          type: string
-        function_call:
-          type: object
-          additionalProperties: true
+          - type: 'null'
+        code:
+          oneOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+      additionalProperties: true
+    ResponseUsage:
+      type: object
+      required:
+      - input_tokens
+      - input_tokens_details
+      - output_tokens
+      - output_tokens_details
+      - total_tokens
+      properties:
+        input_tokens:
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/ResponseUsageDetails'
+        output_tokens:
+          type: integer
+        output_tokens_details:
+          $ref: '#/components/schemas/ResponseUsageDetails'
+        total_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        completion_tokens:
+          type: integer
       additionalProperties: false
     ResponseUsageDetails:
       type: object
@@ -611,25 +610,26 @@ components:
         reasoning_tokens:
           type: integer
       additionalProperties: false
-    ResponseJsonSchemaFormat:
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorObject'
+      additionalProperties: false
+    ResponseInputTextPart:
       type: object
       required:
       - type
-      - name
+      - text
       properties:
         type:
           type: string
           enum:
-          - json_schema
-        name:
+          - input_text
+        text:
           type: string
-        description:
-          type: string
-        schema:
-          type: object
-          additionalProperties: true
-        strict:
-          type: boolean
       additionalProperties: false
   parameters:
     IdempotencyKey:

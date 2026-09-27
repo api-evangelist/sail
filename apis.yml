@@ -47,7 +47,7 @@ image: https://sailresearch.com/og-image.png
 tags:
 - Company
 - Artificial Intelligence
-- Machine-Learning
+- Machine Learning
 - LLM
 - Inference
 - Agents
@@ -64,6 +64,7 @@ tags_raw:
 - Open Source Models
 - Infrastructure
 - Developer Tools
+- Machine-Learning
 apis:
 - aid: sail:sail-batches-api-api
   name: Sail Batches API
