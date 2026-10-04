@@ -142,6 +142,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/sail-capability-edges.yml
+  name: Sail Business Capability Map
 - type: Overlay
   url: overlays/sail-openapi-overlay.yaml
 - type: Website
