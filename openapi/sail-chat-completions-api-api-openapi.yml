@@ -70,6 +70,113 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
+    ChatImageContentPart:
+      type: object
+      description: Image content part. Image input is supported only on multimodal models; see the Models page.
+      required:
+      - type
+      - image_url
+      properties:
+        type:
+          type: string
+          enum:
+          - image_url
+        image_url:
+          type: object
+          required:
+          - url
+          properties:
+            url:
+              type: string
+              description: Public http(s) URL or a base64 data URI.
+            detail:
+              type: string
+              enum:
+              - auto
+              - low
+              - high
+          additionalProperties: false
+      additionalProperties: false
+    ChatCompletionResponseMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - assistant
+        content:
+          oneOf:
+          - type: string
+          - type: 'null'
+        reasoning_content:
+          oneOf:
+          - type: string
+          - type: 'null'
+        refusal:
+          oneOf:
+          - type: string
+          - type: 'null'
+      additionalProperties: true
+    ChatResponseFormatText:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - text
+      additionalProperties: false
+    ChatCompletionChunkDelta:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+        reasoning_content:
+          type: string
+        refusal:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatCompletionChunkToolCall'
+      additionalProperties: false
+    ChatCompletionChunkToolCallFunction:
+      type: object
+      properties:
+        name:
+          type: string
+        arguments:
+          type: string
+        input:
+          type: string
+      additionalProperties: false
+    ChatCompletionChunkChoice:
+      type: object
+      required:
+      - index
+      - delta
+      properties:
+        index:
+          type: integer
+        delta:
+          $ref: '#/components/schemas/ChatCompletionChunkDelta'
+        logprobs:
+          type: 'null'
+        finish_reason:
+          type:
+          - string
+          - 'null'
+          enum:
+          - stop
+          - tool_calls
+          - null
+      additionalProperties: false
     ChatCompletionMessage:
       type: object
       required:
@@ -106,71 +213,6 @@ components:
           type: object
           additionalProperties: true
       additionalProperties: false
-    ChatCompletionUsage:
-      type: object
-      required:
-      - prompt_tokens
-      - completion_tokens
-      - total_tokens
-      properties:
-        prompt_tokens:
-          type: integer
-        completion_tokens:
-          type: integer
-        total_tokens:
-          type: integer
-        prompt_tokens_details:
-          type: object
-          additionalProperties: true
-        completion_tokens_details:
-          type: object
-          additionalProperties: true
-      additionalProperties: false
-    ErrorResponse:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          $ref: '#/components/schemas/ErrorObject'
-      additionalProperties: false
-    ChatResponseFormatText:
-      type: object
-      required:
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - text
-      additionalProperties: false
-    ChatCompletionResponse:
-      type: object
-      required:
-      - id
-      - object
-      - created
-      - model
-      - choices
-      properties:
-        id:
-          type: string
-        object:
-          type: string
-          enum:
-          - chat.completion
-        created:
-          type: integer
-        model:
-          type: string
-        choices:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/ChatCompletionChoice'
-        usage:
-          $ref: '#/components/schemas/ChatCompletionUsage'
-      additionalProperties: true
     ChatCompletionChoice:
       type: object
       required:
@@ -194,49 +236,19 @@ components:
           - content_filter
           - function_call
       additionalProperties: false
-    ChatCompletionResponseMessage:
+    ChatTextContentPart:
       type: object
       required:
-      - role
-      - content
-      properties:
-        role:
-          type: string
-          enum:
-          - assistant
-        content:
-          oneOf:
-          - type: string
-          - type: 'null'
-        reasoning_content:
-          oneOf:
-          - type: string
-          - type: 'null'
-        refusal:
-          oneOf:
-          - type: string
-          - type: 'null'
-      additionalProperties: true
-    ErrorObject:
-      type: object
-      required:
-      - message
       - type
+      - text
       properties:
-        message:
-          type: string
         type:
           type: string
-        param:
-          oneOf:
-          - type: string
-          - type: 'null'
-        code:
-          oneOf:
-          - type: string
-          - type: integer
-          - type: 'null'
-      additionalProperties: true
+          enum:
+          - text
+        text:
+          type: string
+      additionalProperties: false
     ChatResponseFormatJsonSchema:
       type: object
       required:
@@ -263,26 +275,33 @@ components:
               type: boolean
           additionalProperties: false
       additionalProperties: false
-    ChatCompletionChunkChoice:
+    ErrorObject:
       type: object
       required:
-      - index
-      - delta
+      - message
+      - type
       properties:
-        index:
-          type: integer
-        delta:
-          $ref: '#/components/schemas/ChatCompletionChunkDelta'
-        logprobs:
-          type: 'null'
-        finish_reason:
-          type:
-          - string
-          - 'null'
-          enum:
-          - stop
-          - tool_calls
-          - null
+        message:
+          type: string
+        type:
+          type: string
+        param:
+          oneOf:
+          - type: string
+          - type: 'null'
+        code:
+          oneOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+      additionalProperties: true
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorObject'
       additionalProperties: false
     CreateChatCompletionRequest:
       type: object
@@ -383,6 +402,26 @@ components:
           type: string
       additionalProperties:
         type: string
+    ChatCompletionUsage:
+      type: object
+      required:
+      - prompt_tokens
+      - completion_tokens
+      - total_tokens
+      properties:
+        prompt_tokens:
+          type: integer
+        completion_tokens:
+          type: integer
+        total_tokens:
+          type: integer
+        prompt_tokens_details:
+          type: object
+          additionalProperties: true
+        completion_tokens_details:
+          type: object
+          additionalProperties: true
+      additionalProperties: false
     ChatCompletionChunk:
       type: object
       description: 'One Server-Sent Events chunk emitted when stream: true. The streamed response is a sequence of these chat.completion.chunk objects, each sent as an SSE data: line and terminated by a final data: [DONE] line.'
@@ -410,33 +449,33 @@ components:
         usage:
           $ref: '#/components/schemas/ChatCompletionUsage'
       additionalProperties: false
-    ChatImageContentPart:
+    ChatCompletionResponse:
       type: object
-      description: Image content part. Image input is supported only on multimodal models; see the Models page.
       required:
-      - type
-      - image_url
+      - id
+      - object
+      - created
+      - model
+      - choices
       properties:
-        type:
+        id:
+          type: string
+        object:
           type: string
           enum:
-          - image_url
-        image_url:
-          type: object
-          required:
-          - url
-          properties:
-            url:
-              type: string
-              description: Public http(s) URL or a base64 data URI.
-            detail:
-              type: string
-              enum:
-              - auto
-              - low
-              - high
-          additionalProperties: false
-      additionalProperties: false
+          - chat.completion
+        created:
+          type: integer
+        model:
+          type: string
+        choices:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ChatCompletionChoice'
+        usage:
+          $ref: '#/components/schemas/ChatCompletionUsage'
+      additionalProperties: true
     ChatCompletionChunkToolCall:
       type: object
       properties:
@@ -450,45 +489,6 @@ components:
           $ref: '#/components/schemas/ChatCompletionChunkToolCallFunction'
         custom:
           $ref: '#/components/schemas/ChatCompletionChunkToolCallFunction'
-      additionalProperties: false
-    ChatCompletionChunkDelta:
-      type: object
-      properties:
-        role:
-          type: string
-        content:
-          type: string
-        reasoning_content:
-          type: string
-        refusal:
-          type: string
-        tool_calls:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChatCompletionChunkToolCall'
-      additionalProperties: false
-    ChatTextContentPart:
-      type: object
-      required:
-      - type
-      - text
-      properties:
-        type:
-          type: string
-          enum:
-          - text
-        text:
-          type: string
-      additionalProperties: false
-    ChatCompletionChunkToolCallFunction:
-      type: object
-      properties:
-        name:
-          type: string
-        arguments:
-          type: string
-        input:
-          type: string
       additionalProperties: false
   parameters:
     IdempotencyKey:
